@@ -1,16 +1,13 @@
-/* Chung */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
   overflow-x: hidden;
 }
 
-/* Header */
 .navbar-brand {
   font-weight: bold;
 }
 
-/* Sidebar */
 .sidebar-container {
   padding-right: 0;
   padding-left: 0;
@@ -73,12 +70,10 @@ body {
   margin-right: 8px;
 }
 
-/* Main content */
 .main-content {
   transition: margin-left 0.3s ease;
 }
 
-/* Bảng dữ liệu */
 .table {
   font-size: 0.9rem;
 }
@@ -97,12 +92,10 @@ body {
   background-color: #e7f1ff;
 }
 
-/* Phân trang */
 .pagination {
   margin-bottom: 0;
 }
 
-/* Card */
 .card {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   border-radius: 0.5rem;
@@ -114,23 +107,19 @@ body {
   border-radius: 0.5rem 0.5rem 0 0 !important;
 }
 
-/* Form controls */
 .form-control,
 .form-select {
   border-radius: 0.375rem;
 }
 
-/* Badge */
 .badge .btn-close {
   font-size: 0.5rem;
 }
 
-/* Bộ lọc nâng cao */
 #advancedSearch {
   border-radius: 0.5rem;
 }
 
-/* Danh mục */
 .category-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -145,7 +134,6 @@ body {
   margin-bottom: 10px;
 }
 
-/* Chat Widget */
 .chat-icon {
   position: fixed;
   bottom: 20px;
@@ -274,7 +262,6 @@ body {
   margin-right: 10px;
 }
 
-/* Typing indicator */
 .typing-indicator {
   display: flex;
   align-items: center;
@@ -314,7 +301,6 @@ body {
   }
 }
 
-/* Responsive */
 @media (max-width: 992px) {
   .sidebar {
     position: fixed;

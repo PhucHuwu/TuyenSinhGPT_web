@@ -1,541 +1,558 @@
-{% extends 'layout.html' %}
-
-{% block content %}
+{% extends 'layout.html' %} {% block content %}
 <div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Dữ liệu Điểm Chuẩn Đại Học 2024</h5>
-                <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSearch">
-                    <i class="bi bi-funnel"></i> Bộ lọc nâng cao
-                </button>
+  <div class="col-md-12">
+    <div class="card">
+      <div
+        class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">Dữ liệu Điểm Chuẩn Đại Học 2024</h5>
+        <button
+          class="btn btn-light btn-sm"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#advancedSearch"
+        >
+          <i class="bi bi-funnel"></i> Bộ lọc nâng cao
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <input
+                type="text"
+                id="searchInput"
+                class="form-control"
+                placeholder="Tìm kiếm theo từ khóa..."
+              />
+              <button class="btn btn-primary" id="searchBtn">
+                <i class="bi bi-search"></i> Tìm kiếm
+              </button>
             </div>
-            <div class="card-body">
-                <!-- Tìm kiếm cơ bản -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo từ khóa...">
-                            <button class="btn btn-primary" id="searchBtn">
-                                <i class="bi bi-search"></i> Tìm kiếm
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <select id="limitSelect" class="form-select">
-                            <option value="10">10 dòng</option>
-                            <option value="20">20 dòng</option>
-                            <option value="50">50 dòng</option>
-                            <option value="100">100 dòng</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-secondary w-100" id="resetBtn">
-                            <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Bộ lọc nâng cao -->
-                <div class="collapse mb-4" id="advancedSearch">
-                    <div class="card card-body bg-light">
-                        <h6 class="mb-3">Bộ lọc nâng cao</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Trường đào tạo</label>
-                                <select id="truongFilter" class="form-select">
-                                    <option value="">Tất cả trường</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Nhóm ngành</label>
-                                <select id="nhomNganhFilter" class="form-select">
-                                    <option value="">Tất cả nhóm ngành</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Tổ hợp môn</label>
-                                <select id="toHopMonFilter" class="form-select">
-                                    <option value="">Tất cả tổ hợp môn</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Khoảng điểm chuẩn</label>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <input type="number" id="diemMinFilter" class="form-control" placeholder="Từ" min="0" max="30" step="0.01">
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="number" id="diemMaxFilter" class="form-control" placeholder="Đến" min="0" max="30" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button class="btn btn-primary" id="applyFilterBtn">
-                                    <i class="bi bi-funnel-fill"></i> Áp dụng bộ lọc
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hiển thị bộ lọc đang áp dụng -->
-                <div id="activeFilters" class="mb-3 d-none">
-                    <h6 class="mb-2">Bộ lọc đang áp dụng:</h6>
-                    <div class="d-flex flex-wrap gap-2" id="filterBadges">
-                        <!-- Các badge sẽ được thêm vào đây bằng JavaScript -->
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-primary">
-                            <tr>
-                                <th data-sort="Nhóm ngành">Nhóm ngành <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Ngành">Ngành <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Trường đào tạo">Trường đào tạo <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Mã ngành">Mã ngành <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Tên ngành">Tên ngành <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Tổ hợp môn">Tổ hợp môn <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Điểm chuẩn 2024">Điểm chuẩn 2024 <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                                <th data-sort="Ghi chú">Ghi chú <i class="bi bi-arrow-down-up sort-icon"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody id="dataTable">
-                            <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div>
-                        Hiển thị <span id="currentRange">0-0</span> của <span id="totalRecords">0</span> kết quả
-                    </div>
-                    <nav>
-                        <ul class="pagination" id="pagination">
-                            <!-- Phân trang sẽ được thêm vào đây bằng JavaScript -->
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="limitSelect" class="form-select">
+              <option value="10">10 dòng</option>
+              <option value="20">20 dòng</option>
+              <option value="50">50 dòng</option>
+              <option value="100">100 dòng</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-secondary w-100" id="resetBtn">
+              <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+            </button>
+          </div>
         </div>
+
+        <div class="collapse mb-4" id="advancedSearch">
+          <div class="card card-body bg-light">
+            <h6 class="mb-3">Bộ lọc nâng cao</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Trường đào tạo</label>
+                <select id="truongFilter" class="form-select">
+                  <option value="">Tất cả trường</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Nhóm ngành</label>
+                <select id="nhomNganhFilter" class="form-select">
+                  <option value="">Tất cả nhóm ngành</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Tổ hợp môn</label>
+                <select id="toHopMonFilter" class="form-select">
+                  <option value="">Tất cả tổ hợp môn</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Khoảng điểm chuẩn</label>
+                <div class="row">
+                  <div class="col-6">
+                    <input
+                      type="number"
+                      id="diemMinFilter"
+                      class="form-control"
+                      placeholder="Từ"
+                      min="0"
+                      max="30"
+                      step="0.01"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <input
+                      type="number"
+                      id="diemMaxFilter"
+                      class="form-control"
+                      placeholder="Đến"
+                      min="0"
+                      max="30"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 text-end">
+                <button class="btn btn-primary" id="applyFilterBtn">
+                  <i class="bi bi-funnel-fill"></i> Áp dụng bộ lọc
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="activeFilters" class="mb-3 d-none">
+          <h6 class="mb-2">Bộ lọc đang áp dụng:</h6>
+          <div class="d-flex flex-wrap gap-2" id="filterBadges"></div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th data-sort="Nhóm ngành">
+                  Nhóm ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Ngành">
+                  Ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Trường đào tạo">
+                  Trường đào tạo <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Mã ngành">
+                  Mã ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Tên ngành">
+                  Tên ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Tổ hợp môn">
+                  Tổ hợp môn <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Điểm chuẩn 2024">
+                  Điểm chuẩn 2024 <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="Ghi chú">
+                  Ghi chú <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="dataTable"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            Hiển thị <span id="currentRange">0-0</span> của
+            <span id="totalRecords">0</span> kết quả
+          </div>
+          <nav>
+            <ul class="pagination" id="pagination"></ul>
+          </nav>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Biến lưu trạng thái hiện tại
-        let currentState = {
-            page: 1,
-            limit: 10,
-            search: '',
-            sort_by: 'Điểm chuẩn 2024',
-            sort_order: -1,
-            truong: '',
-            nhom_nganh: '',
-            to_hop_mon: '',
-            diem_min: '',
-            diem_max: ''
-        };
+  document.addEventListener("DOMContentLoaded", function () {
+    let currentState = {
+      page: 1,
+      limit: 10,
+      search: "",
+      sort_by: "Điểm chuẩn 2024",
+      sort_order: -1,
+      truong: "",
+      nhom_nganh: "",
+      to_hop_mon: "",
+      diem_min: "",
+      diem_max: "",
+    };
 
-        // Hàm tải dữ liệu
-        function loadData() {
-            // Hiển thị loading
-            document.getElementById('dataTable').innerHTML = '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
-            
-            // Xây dựng URL với các tham số
-            let url = `/api/diem-chuan?page=${currentState.page}&limit=${currentState.limit}&sort_by=${currentState.sort_by}&sort_order=${currentState.sort_order}`;
-            
-            // Thêm tham số tìm kiếm nếu có
-            if (currentState.search) {
-                url += `&search=${encodeURIComponent(currentState.search)}`;
-            }
-            
-            // Thêm các tham số lọc nâng cao
-            if (currentState.truong) {
-                url += `&truong=${encodeURIComponent(currentState.truong)}`;
-            }
-            
-            if (currentState.nhom_nganh) {
-                url += `&nhom_nganh=${encodeURIComponent(currentState.nhom_nganh)}`;
-            }
-            
-            if (currentState.to_hop_mon) {
-                url += `&to_hop_mon=${encodeURIComponent(currentState.to_hop_mon)}`;
-            }
-            
-            if (currentState.diem_min) {
-                url += `&diem_min=${encodeURIComponent(currentState.diem_min)}`;
-            }
-            
-            if (currentState.diem_max) {
-                url += `&diem_max=${encodeURIComponent(currentState.diem_max)}`;
-            }
-            
-            // Gọi API
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    renderTable(data.data);
-                    renderPagination(data.page, data.total_pages, data.total);
-                    updateActiveFilters();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('dataTable').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
-                });
+    function loadData() {
+      document.getElementById("dataTable").innerHTML =
+        '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
+
+      let url = `/api/diem-chuan?page=${currentState.page}&limit=${currentState.limit}&sort_by=${currentState.sort_by}&sort_order=${currentState.sort_order}`;
+
+      if (currentState.search) {
+        url += `&search=${encodeURIComponent(currentState.search)}`;
+      }
+
+      if (currentState.truong) {
+        url += `&truong=${encodeURIComponent(currentState.truong)}`;
+      }
+
+      if (currentState.nhom_nganh) {
+        url += `&nhom_nganh=${encodeURIComponent(currentState.nhom_nganh)}`;
+      }
+
+      if (currentState.to_hop_mon) {
+        url += `&to_hop_mon=${encodeURIComponent(currentState.to_hop_mon)}`;
+      }
+
+      if (currentState.diem_min) {
+        url += `&diem_min=${encodeURIComponent(currentState.diem_min)}`;
+      }
+
+      if (currentState.diem_max) {
+        url += `&diem_max=${encodeURIComponent(currentState.diem_max)}`;
+      }
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          renderTable(data.data);
+          renderPagination(data.page, data.total_pages, data.total);
+          updateActiveFilters();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("dataTable").innerHTML =
+            '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+        });
+    }
+
+    function renderTable(data) {
+      const tableBody = document.getElementById("dataTable");
+
+      if (data.length === 0) {
+        tableBody.innerHTML =
+          '<tr><td colspan="8" class="text-center">Không có dữ liệu</td></tr>';
+        return;
+      }
+
+      let html = "";
+      data.forEach((item) => {
+        let diemClass = "";
+        const diem = parseFloat(item["Điểm chuẩn 2024"]);
+        if (!isNaN(diem)) {
+          if (diem >= 28) diemClass = "text-danger fw-bold";
+          else if (diem >= 25) diemClass = "text-warning fw-bold";
+          else if (diem >= 22) diemClass = "text-success fw-bold";
         }
 
-        // Hàm hiển thị dữ liệu trong bảng
-        function renderTable(data) {
-            const tableBody = document.getElementById('dataTable');
-            
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" class="text-center">Không có dữ liệu</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(item => {
-                // Xác định class cho điểm chuẩn dựa trên giá trị
-                let diemClass = '';
-                const diem = parseFloat(item['Điểm chuẩn 2024']);
-                if (!isNaN(diem)) {
-                    if (diem >= 28) diemClass = 'text-danger fw-bold';
-                    else if (diem >= 25) diemClass = 'text-warning fw-bold';
-                    else if (diem >= 22) diemClass = 'text-success fw-bold';
-                }
-                
-                html += `
+        html += `
                 <tr>
-                    <td>${item['Nhóm ngành'] || ''}</td>
-                    <td>${item['Ngành'] || ''}</td>
-                    <td>${item['Trường đào tạo'] || ''}</td>
-                    <td>${item['Mã ngành'] || ''}</td>
-                    <td>${item['Tên ngành'] || ''}</td>
-                    <td>${item['Tổ hợp môn'] || ''}</td>
-                    <td class="text-center ${diemClass}">${item['Điểm chuẩn 2024'] || ''}</td>
-                    <td>${item['Ghi chú'] || ''}</td>
+                    <td>${item["Nhóm ngành"] || ""}</td>
+                    <td>${item["Ngành"] || ""}</td>
+                    <td>${item["Trường đào tạo"] || ""}</td>
+                    <td>${item["Mã ngành"] || ""}</td>
+                    <td>${item["Tên ngành"] || ""}</td>
+                    <td>${item["Tổ hợp môn"] || ""}</td>
+                    <td class="text-center ${diemClass}">${
+          item["Điểm chuẩn 2024"] || ""
+        }</td>
+                    <td>${item["Ghi chú"] || ""}</td>
                 </tr>
                 `;
-            });
-            
-            tableBody.innerHTML = html;
-        }
+      });
 
-        // Hàm hiển thị phân trang
-        function renderPagination(currentPage, totalPages, totalRecords) {
-            const pagination = document.getElementById('pagination');
-            const currentRange = document.getElementById('currentRange');
-            const totalRecordsElement = document.getElementById('totalRecords');
-            
-            // Hiển thị thông tin về phạm vi hiển thị
-            const start = (currentPage - 1) * currentState.limit + 1;
-            const end = Math.min(currentPage * currentState.limit, totalRecords);
-            currentRange.textContent = `${start}-${end}`;
-            totalRecordsElement.textContent = totalRecords;
-            
-            // Tạo phân trang
-            let html = '';
-            
-            // Nút Previous
-            html += `
-            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage - 1}">Trước</a>
+      tableBody.innerHTML = html;
+    }
+
+    function renderPagination(currentPage, totalPages, totalRecords) {
+      const pagination = document.getElementById("pagination");
+      const currentRange = document.getElementById("currentRange");
+      const totalRecordsElement = document.getElementById("totalRecords");
+
+      const start = (currentPage - 1) * currentState.limit + 1;
+      const end = Math.min(currentPage * currentState.limit, totalRecords);
+      currentRange.textContent = `${start}-${end}`;
+      totalRecordsElement.textContent = totalRecords;
+
+      let html = "";
+
+      html += `
+            <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+                <a class="page-link" href="#" data-page="${
+                  currentPage - 1
+                }">Trước</a>
             </li>
             `;
-            
-            // Các trang
-            const maxPages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
-            let endPage = Math.min(totalPages, startPage + maxPages - 1);
-            
-            if (endPage - startPage + 1 < maxPages) {
-                startPage = Math.max(1, endPage - maxPages + 1);
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                html += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
+
+      const maxPages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+      let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+      if (endPage - startPage + 1 < maxPages) {
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+                <li class="page-item ${i === currentPage ? "active" : ""}">
                     <a class="page-link" href="#" data-page="${i}">${i}</a>
                 </li>
                 `;
-            }
-            
-            // Nút Next
-            html += `
-            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage + 1}">Sau</a>
+      }
+
+      html += `
+            <li class="page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }">
+                <a class="page-link" href="#" data-page="${
+                  currentPage + 1
+                }">Sau</a>
             </li>
             `;
-            
-            pagination.innerHTML = html;
-            
-            // Thêm sự kiện click cho các nút phân trang
-            document.querySelectorAll('#pagination .page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = parseInt(this.getAttribute('data-page'));
-                    if (page >= 1 && page <= totalPages) {
-                        currentState.page = page;
-                        loadData();
-                    }
-                });
-            });
-        }
 
-        // Hàm cập nhật hiển thị các bộ lọc đang áp dụng
-        function updateActiveFilters() {
-            const filterBadges = document.getElementById('filterBadges');
-            const activeFiltersContainer = document.getElementById('activeFilters');
-            
-            // Xóa tất cả các badge hiện tại
-            filterBadges.innerHTML = '';
-            
-            // Mảng lưu trữ các bộ lọc đang áp dụng
-            const activeFilters = [];
-            
-            // Kiểm tra từng bộ lọc
-            if (currentState.search) {
-                activeFilters.push({
-                    name: 'Từ khóa',
-                    value: currentState.search,
-                    key: 'search'
-                });
-            }
-            
-            if (currentState.truong) {
-                activeFilters.push({
-                    name: 'Trường',
-                    value: currentState.truong,
-                    key: 'truong'
-                });
-            }
-            
-            if (currentState.nhom_nganh) {
-                activeFilters.push({
-                    name: 'Nhóm ngành',
-                    value: currentState.nhom_nganh,
-                    key: 'nhom_nganh'
-                });
-            }
-            
-            if (currentState.to_hop_mon) {
-                activeFilters.push({
-                    name: 'Tổ hợp môn',
-                    value: currentState.to_hop_mon,
-                    key: 'to_hop_mon'
-                });
-            }
-            
-            if (currentState.diem_min) {
-                activeFilters.push({
-                    name: 'Điểm tối thiểu',
-                    value: currentState.diem_min,
-                    key: 'diem_min'
-                });
-            }
-            
-            if (currentState.diem_max) {
-                activeFilters.push({
-                    name: 'Điểm tối đa',
-                    value: currentState.diem_max,
-                    key: 'diem_max'
-                });
-            }
-            
-            // Nếu có bộ lọc đang áp dụng, hiển thị container
-            if (activeFilters.length > 0) {
-                activeFiltersContainer.classList.remove('d-none');
-                
-                // Tạo badge cho mỗi bộ lọc
-                activeFilters.forEach(filter => {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge bg-primary me-2 mb-2 d-flex align-items-center';
-                    badge.innerHTML = `
+      pagination.innerHTML = html;
+
+      document.querySelectorAll("#pagination .page-link").forEach((link) => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const page = parseInt(this.getAttribute("data-page"));
+          if (page >= 1 && page <= totalPages) {
+            currentState.page = page;
+            loadData();
+          }
+        });
+      });
+    }
+
+    function updateActiveFilters() {
+      const filterBadges = document.getElementById("filterBadges");
+      const activeFiltersContainer = document.getElementById("activeFilters");
+
+      filterBadges.innerHTML = "";
+
+      const activeFilters = [];
+
+      if (currentState.search) {
+        activeFilters.push({
+          name: "Từ khóa",
+          value: currentState.search,
+          key: "search",
+        });
+      }
+
+      if (currentState.truong) {
+        activeFilters.push({
+          name: "Trường",
+          value: currentState.truong,
+          key: "truong",
+        });
+      }
+
+      if (currentState.nhom_nganh) {
+        activeFilters.push({
+          name: "Nhóm ngành",
+          value: currentState.nhom_nganh,
+          key: "nhom_nganh",
+        });
+      }
+
+      if (currentState.to_hop_mon) {
+        activeFilters.push({
+          name: "Tổ hợp môn",
+          value: currentState.to_hop_mon,
+          key: "to_hop_mon",
+        });
+      }
+
+      if (currentState.diem_min) {
+        activeFilters.push({
+          name: "Điểm tối thiểu",
+          value: currentState.diem_min,
+          key: "diem_min",
+        });
+      }
+
+      if (currentState.diem_max) {
+        activeFilters.push({
+          name: "Điểm tối đa",
+          value: currentState.diem_max,
+          key: "diem_max",
+        });
+      }
+
+      if (activeFilters.length > 0) {
+        activeFiltersContainer.classList.remove("d-none");
+
+        activeFilters.forEach((filter) => {
+          const badge = document.createElement("span");
+          badge.className =
+            "badge bg-primary me-2 mb-2 d-flex align-items-center";
+          badge.innerHTML = `
                         ${filter.name}: ${filter.value}
                         <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close" data-filter-key="${filter.key}"></button>
                     `;
-                    filterBadges.appendChild(badge);
-                });
-                
-                // Thêm sự kiện click cho các nút xóa bộ lọc
-                document.querySelectorAll('#filterBadges .btn-close').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const filterKey = this.getAttribute('data-filter-key');
-                        currentState[filterKey] = '';
-                        
-                        // Cập nhật giao diện
-                        if (filterKey === 'truong') {
-                            document.getElementById('truongFilter').value = '';
-                        } else if (filterKey === 'nhom_nganh') {
-                            document.getElementById('nhomNganhFilter').value = '';
-                        } else if (filterKey === 'to_hop_mon') {
-                            document.getElementById('toHopMonFilter').value = '';
-                        } else if (filterKey === 'diem_min') {
-                            document.getElementById('diemMinFilter').value = '';
-                        } else if (filterKey === 'diem_max') {
-                            document.getElementById('diemMaxFilter').value = '';
-                        } else if (filterKey === 'search') {
-                            document.getElementById('searchInput').value = '';
-                        }
-                        
-                        currentState.page = 1;
-                        loadData();
-                    });
-                });
-            } else {
-                activeFiltersContainer.classList.add('d-none');
+          filterBadges.appendChild(badge);
+        });
+
+        document.querySelectorAll("#filterBadges .btn-close").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const filterKey = this.getAttribute("data-filter-key");
+            currentState[filterKey] = "";
+
+            if (filterKey === "truong") {
+              document.getElementById("truongFilter").value = "";
+            } else if (filterKey === "nhom_nganh") {
+              document.getElementById("nhomNganhFilter").value = "";
+            } else if (filterKey === "to_hop_mon") {
+              document.getElementById("toHopMonFilter").value = "";
+            } else if (filterKey === "diem_min") {
+              document.getElementById("diemMinFilter").value = "";
+            } else if (filterKey === "diem_max") {
+              document.getElementById("diemMaxFilter").value = "";
+            } else if (filterKey === "search") {
+              document.getElementById("searchInput").value = "";
             }
-        }
 
-        // Tải danh sách trường đào tạo
-        function loadTruongDaoTao() {
-            fetch('/api/truong-dao-tao')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('truongFilter');
-                    data.sort().forEach(truong => {
-                        const option = document.createElement('option');
-                        option.value = truong;
-                        option.textContent = truong;
-                        select.appendChild(option);
-                    });
-                });
-        }
-
-        // Tải danh sách nhóm ngành
-        function loadNhomNganh() {
-            fetch('/api/nhom-nganh')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('nhomNganhFilter');
-                    data.sort().forEach(nhomNganh => {
-                        const option = document.createElement('option');
-                        option.value = nhomNganh;
-                        option.textContent = nhomNganh;
-                        select.appendChild(option);
-                    });
-                });
-        }
-
-        // Tải danh sách tổ hợp môn
-        function loadToHopMon() {
-            fetch('/api/to-hop-mon')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('toHopMonFilter');
-                    data.forEach(toHopMon => {
-                        const option = document.createElement('option');
-                        option.value = toHopMon;
-                        option.textContent = toHopMon;
-                        select.appendChild(option);
-                    });
-                });
-        }
-
-        // Xử lý sự kiện tìm kiếm
-        document.getElementById('searchBtn').addEventListener('click', function() {
-            currentState.search = document.getElementById('searchInput').value;
             currentState.page = 1;
             loadData();
+          });
         });
+      } else {
+        activeFiltersContainer.classList.add("d-none");
+      }
+    }
 
-        // Xử lý sự kiện nhấn Enter trong ô tìm kiếm
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                currentState.search = this.value;
-                currentState.page = 1;
-                loadData();
-            }
+    function loadTruongDaoTao() {
+      fetch("/api/truong-dao-tao")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("truongFilter");
+          data.sort().forEach((truong) => {
+            const option = document.createElement("option");
+            option.value = truong;
+            option.textContent = truong;
+            select.appendChild(option);
+          });
         });
+    }
 
-        // Xử lý sự kiện thay đổi số lượng hiển thị
-        document.getElementById('limitSelect').addEventListener('change', function() {
-            currentState.limit = parseInt(this.value);
-            currentState.page = 1;
-            loadData();
+    function loadNhomNganh() {
+      fetch("/api/nhom-nganh")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("nhomNganhFilter");
+          data.sort().forEach((nhomNganh) => {
+            const option = document.createElement("option");
+            option.value = nhomNganh;
+            option.textContent = nhomNganh;
+            select.appendChild(option);
+          });
         });
+    }
 
-        // Xử lý sự kiện áp dụng bộ lọc nâng cao
-        document.getElementById('applyFilterBtn').addEventListener('click', function() {
-            currentState.truong = document.getElementById('truongFilter').value;
-            currentState.nhom_nganh = document.getElementById('nhomNganhFilter').value;
-            currentState.to_hop_mon = document.getElementById('toHopMonFilter').value;
-            currentState.diem_min = document.getElementById('diemMinFilter').value;
-            currentState.diem_max = document.getElementById('diemMaxFilter').value;
-            currentState.page = 1;
-            loadData();
-            
-            // Đóng bộ lọc nâng cao sau khi áp dụng
-            const bsCollapse = new bootstrap.Collapse(document.getElementById('advancedSearch'));
-            bsCollapse.hide();
+    function loadToHopMon() {
+      fetch("/api/to-hop-mon")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("toHopMonFilter");
+          data.forEach((toHopMon) => {
+            const option = document.createElement("option");
+            option.value = toHopMon;
+            option.textContent = toHopMon;
+            select.appendChild(option);
+          });
         });
+    }
 
-        // Xử lý sự kiện đặt lại bộ lọc
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            // Đặt lại tất cả các trường
-            document.getElementById('searchInput').value = '';
-            document.getElementById('truongFilter').value = '';
-            document.getElementById('nhomNganhFilter').value = '';
-            document.getElementById('toHopMonFilter').value = '';
-            document.getElementById('diemMinFilter').value = '';
-            document.getElementById('diemMaxFilter').value = '';
-            
-            // Đặt lại trạng thái
-            currentState.search = '';
-            currentState.truong = '';
-            currentState.nhom_nganh = '';
-            currentState.to_hop_mon = '';
-            currentState.diem_min = '';
-            currentState.diem_max = '';
-            currentState.page = 1;
-            
-            // Tải lại dữ liệu
-            loadData();
-        });
-
-        // Xử lý sự kiện sắp x��p
-        document.querySelectorAll('th[data-sort]').forEach(th => {
-            th.addEventListener('click', function() {
-                const sortBy = this.getAttribute('data-sort');
-                
-                // Nếu đang sắp xếp theo cột này, đảo ngược thứ tự
-                if (currentState.sort_by === sortBy) {
-                    currentState.sort_order = currentState.sort_order === 1 ? -1 : 1;
-                } else {
-                    currentState.sort_by = sortBy;
-                    currentState.sort_order = -1; // Mặc định giảm dần
-                }
-                
-                // Cập nhật giao diện
-                document.querySelectorAll('th[data-sort] .sort-icon').forEach(icon => {
-                    icon.className = 'bi bi-arrow-down-up sort-icon';
-                });
-                
-                const icon = this.querySelector('.sort-icon');
-                icon.className = `bi bi-arrow-${currentState.sort_order === 1 ? 'up' : 'down'} sort-icon`;
-                
-                loadData();
-            });
-        });
-
-        // Import dữ liệu khi trang được tải
-        fetch('/import-data')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // Sau khi import xong, tải dữ liệu
-                loadData();
-                loadTruongDaoTao();
-                loadNhomNganh();
-                loadToHopMon();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    document.getElementById("searchBtn").addEventListener("click", function () {
+      currentState.search = document.getElementById("searchInput").value;
+      currentState.page = 1;
+      loadData();
     });
+
+    document
+      .getElementById("searchInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          currentState.search = this.value;
+          currentState.page = 1;
+          loadData();
+        }
+      });
+
+    document
+      .getElementById("limitSelect")
+      .addEventListener("change", function () {
+        currentState.limit = parseInt(this.value);
+        currentState.page = 1;
+        loadData();
+      });
+
+    document
+      .getElementById("applyFilterBtn")
+      .addEventListener("click", function () {
+        currentState.truong = document.getElementById("truongFilter").value;
+        currentState.nhom_nganh =
+          document.getElementById("nhomNganhFilter").value;
+        currentState.to_hop_mon =
+          document.getElementById("toHopMonFilter").value;
+        currentState.diem_min = document.getElementById("diemMinFilter").value;
+        currentState.diem_max = document.getElementById("diemMaxFilter").value;
+        currentState.page = 1;
+        loadData();
+
+        const bsCollapse = new bootstrap.Collapse(
+          document.getElementById("advancedSearch")
+        );
+        bsCollapse.hide();
+      });
+
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("truongFilter").value = "";
+      document.getElementById("nhomNganhFilter").value = "";
+      document.getElementById("toHopMonFilter").value = "";
+      document.getElementById("diemMinFilter").value = "";
+      document.getElementById("diemMaxFilter").value = "";
+
+      currentState.search = "";
+      currentState.truong = "";
+      currentState.nhom_nganh = "";
+      currentState.to_hop_mon = "";
+      currentState.diem_min = "";
+      currentState.diem_max = "";
+      currentState.page = 1;
+
+      loadData();
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach((th) => {
+      th.addEventListener("click", function () {
+        const sortBy = this.getAttribute("data-sort");
+
+        if (currentState.sort_by === sortBy) {
+          currentState.sort_order = currentState.sort_order === 1 ? -1 : 1;
+        } else {
+          currentState.sort_by = sortBy;
+          currentState.sort_order = -1;
+        }
+
+        document
+          .querySelectorAll("th[data-sort] .sort-icon")
+          .forEach((icon) => {
+            icon.className = "bi bi-arrow-down-up sort-icon";
+          });
+
+        const icon = this.querySelector(".sort-icon");
+        icon.className = `bi bi-arrow-${
+          currentState.sort_order === 1 ? "up" : "down"
+        } sort-icon`;
+
+        loadData();
+      });
+    });
+
+    fetch("/import-data")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.message);
+        loadData();
+        loadTruongDaoTao();
+        loadNhomNganh();
+        loadToHopMon();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  });
 </script>
 {% endblock %}

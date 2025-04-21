@@ -1,400 +1,409 @@
-{% extends 'layout.html' %}
-
-{% block content %}
+{% extends 'layout.html' %} {% block content %}
 <div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Tìm kiếm nâng cao</h5>
-            </div>
-            <div class="card-body">
-                <form id="advancedSearchForm">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0">Thông tin cơ bản</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Từ khóa</label>
-                                        <input type="text" id="keywordInput" class="form-control" placeholder="Nhập từ khóa tìm kiếm...">
-                                        <div class="form-text">Tìm kiếm trong tên ngành, mã ngành, trường đào tạo...</div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label">Trường đào tạo</label>
-                                        <select id="truongSelect" class="form-select">
-                                            <option value="">Tất cả trường</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label">Nhóm ngành</label>
-                                        <select id="nhomNganhSelect" class="form-select">
-                                            <option value="">Tất cả nhóm ngành</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0">Điểm chuẩn & Tổ hợp môn</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Khoảng điểm chuẩn</label>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="input-group">
-                                                    <span class="input-group-text">Từ</span>
-                                                    <input type="number" id="diemMinInput" class="form-control" min="0" max="30" step="0.01">
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="input-group">
-                                                    <span class="input-group-text">Đến</span>
-                                                    <input type="number" id="diemMaxInput" class="form-control" min="0" max="30" step="0.01">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label">Tổ hợp môn</label>
-                                        <select id="toHopMonSelect" class="form-select">
-                                            <option value="">Tất cả tổ hợp môn</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label">Sắp xếp kết quả theo</label>
-                                        <div class="row">
-                                            <div class="col-8">
-                                                <select id="sortBySelect" class="form-select">
-                                                    <option value="Điểm chuẩn 2024">Điểm chuẩn</option>
-                                                    <option value="Trường đào tạo">Trường đào tạo</option>
-                                                    <option value="Nhóm ngành">Nhóm ngành</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-4">
-                                                <select id="sortOrderSelect" class="form-select">
-                                                    <option value="-1">Giảm dần</option>
-                                                    <option value="1">Tăng dần</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-search"></i> Tìm kiếm
-                        </button>
-                        <button type="reset" class="btn btn-outline-secondary px-4 ms-2">
-                            <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
-                        </button>
-                    </div>
-                </form>
-                
-                <hr class="my-4">
-                
-                <div id="searchResults" class="d-none">
-                    <h5 class="mb-3">Kết quả tìm kiếm</h5>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>Nhóm ngành</th>
-                                    <th>Ngành</th>
-                                    <th>Trường đào tạo</th>
-                                    <th>Mã ngành</th>
-                                    <th>Tên ngành</th>
-                                    <th>Tổ hợp môn</th>
-                                    <th>Điểm chuẩn 2024</th>
-                                    <th>Ghi chú</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultsTable">
-                                <!-- Kết quả tìm kiếm sẽ được thêm vào đây -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                            Hiển thị <span id="resultRange">0-0</span> của <span id="totalResults">0</span> kết quả
-                        </div>
-                        <nav>
-                            <ul class="pagination" id="resultsPagination">
-                                <!-- Phân trang sẽ được thêm vào đây -->
-                            </ul>
-                        </nav>
-                    </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Tìm kiếm nâng cao</h5>
+      </div>
+      <div class="card-body">
+        <form id="advancedSearchForm">
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Thông tin cơ bản</h6>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Từ khóa</label>
+                    <input
+                      type="text"
+                      id="keywordInput"
+                      class="form-control"
+                      placeholder="Nhập từ khóa tìm kiếm..."
+                    />
+                    <div class="form-text">
+                      Tìm kiếm trong tên ngành, mã ngành, trường đào tạo...
+                    </div>
+                  </div>
 
-{% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Biến lưu trạng thái tìm kiếm
-        let searchState = {
-            page: 1,
-            limit: 20,
-            keyword: '',
-            truong: '',
-            nhomNganh: '',
-            toHopMon: '',
-            diemMin: '',
-            diemMax: '',
-            sortBy: 'Điểm chuẩn 2024',
-            sortOrder: -1
-        };
-        
-        // Tải dữ liệu cho các dropdown
-        loadTruongDaoTao();
-        loadNhomNganh();
-        loadToHopMon();
-        
-        // Xử lý sự kiện submit form tìm kiếm
-        document.getElementById('advancedSearchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Cập nhật trạng thái tìm kiếm
-            searchState.keyword = document.getElementById('keywordInput').value;
-            searchState.truong = document.getElementById('truongSelect').value;
-            searchState.nhomNganh = document.getElementById('nhomNganhSelect').value;
-            searchState.toHopMon = document.getElementById('toHopMonSelect').value;
-            searchState.diemMin = document.getElementById('diemMinInput').value;
-            searchState.diemMax = document.getElementById('diemMaxInput').value;
-            searchState.sortBy = document.getElementById('sortBySelect').value;
-            searchState.sortOrder = parseInt(document.getElementById('sortOrderSelect').value);
-            searchState.page = 1;
-            
-            // Thực hiện tìm kiếm
-            performSearch();
-        });
-        
-        // Xử lý sự kiện reset form
-        document.getElementById('advancedSearchForm').addEventListener('reset', function() {
-            // Đặt lại trạng thái tìm kiếm
-            searchState = {
-                page: 1,
-                limit: 20,
-                keyword: '',
-                truong: '',
-                nhomNganh: '',
-                toHopMon: '',
-                diemMin: '',
-                diemMax: '',
-                sortBy: 'Điểm chuẩn 2024',
-                sortOrder: -1
-            };
-            
-            // Ẩn kết quả tìm kiếm
-            document.getElementById('searchResults').classList.add('d-none');
-        });
-        
-        // Hàm thực hiện tìm kiếm
-        function performSearch() {
-            // Hiển thị loading
-            document.getElementById('searchResults').classList.remove('d-none');
-            document.getElementById('resultsTable').innerHTML = '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
-            
-            // Xây dựng URL với các tham số
-            let url = `/api/diem-chuan?page=${searchState.page}&limit=${searchState.limit}&sort_by=${searchState.sortBy}&sort_order=${searchState.sortOrder}`;
-            
-            // Thêm các tham số tìm kiếm
-            if (searchState.keyword) {
-                url += `&search=${encodeURIComponent(searchState.keyword)}`;
-            }
-            
-            if (searchState.truong) {
-                url += `&truong=${encodeURIComponent(searchState.truong)}`;
-            }
-            
-            if (searchState.nhomNganh) {
-                url += `&nhom_nganh=${encodeURIComponent(searchState.nhomNganh)}`;
-            }
-            
-            if (searchState.toHopMon) {
-                url += `&to_hop_mon=${encodeURIComponent(searchState.toHopMon)}`;
-            }
-            
-            if (searchState.diemMin) {
-                url += `&diem_min=${encodeURIComponent(searchState.diemMin)}`;
-            }
-            
-            if (searchState.diemMax) {
-                url += `&diem_max=${encodeURIComponent(searchState.diemMax)}`;
-            }
-            
-            // Gọi API
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    renderResults(data.data);
-                    renderResultsPagination(data.page, data.total_pages, data.total);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('resultsTable').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
-                });
-        }
-        
-        // Hàm hiển thị kết quả tìm kiếm
-        function renderResults(data) {
-            const tableBody = document.getElementById('resultsTable');
-            
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" class="text-center">Không có kết quả phù hợp</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(item => {
-                // Xác định class cho điểm chuẩn dựa trên giá trị
-                let diemClass = '';
-                const diem = parseFloat(item['Điểm chuẩn 2024']);
-                if (!isNaN(diem)) {
-                    if (diem >= 28) diemClass = 'text-danger fw-bold';
-                    else if (diem >= 25) diemClass = 'text-warning fw-bold';
-                    else if (diem >= 22) diemClass = 'text-success fw-bold';
-                }
-                
-                html += `
+                  <div class="mb-3">
+                    <label class="form-label">Trường đào tạo</label>
+                    <select id="truongSelect" class="form-select">
+                      <option value="">Tất cả trường</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Nhóm ngành</label>
+                    <select id="nhomNganhSelect" class="form-select">
+                      <option value="">Tất cả nhóm ngành</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Điểm chuẩn & Tổ hợp môn</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Khoảng điểm chuẩn</label>
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="input-group">
+                          <span class="input-group-text">Từ</span>
+                          <input
+                            type="number"
+                            id="diemMinInput"
+                            class="form-control"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="input-group">
+                          <span class="input-group-text">Đến</span>
+                          <input
+                            type="number"
+                            id="diemMaxInput"
+                            class="form-control"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Tổ hợp môn</label>
+                    <select id="toHopMonSelect" class="form-select">
+                      <option value="">Tất cả tổ hợp môn</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Sắp xếp kết quả theo</label>
+                    <div class="row">
+                      <div class="col-8">
+                        <select id="sortBySelect" class="form-select">
+                          <option value="Điểm chuẩn 2024">Điểm chuẩn</option>
+                          <option value="Trường đào tạo">Trường đào tạo</option>
+                          <option value="Nhóm ngành">Nhóm ngành</option>
+                        </select>
+                      </div>
+                      <div class="col-4">
+                        <select id="sortOrderSelect" class="form-select">
+                          <option value="-1">Giảm dần</option>
+                          <option value="1">Tăng dần</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+            <button type="reset" class="btn btn-outline-secondary px-4 ms-2">
+              <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+            </button>
+          </div>
+        </form>
+
+        <hr class="my-4" />
+
+        <div id="searchResults" class="d-none">
+          <h5 class="mb-3">Kết quả tìm kiếm</h5>
+
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-primary">
                 <tr>
-                    <td>${item['Nhóm ngành'] || ''}</td>
-                    <td>${item['Ngành'] || ''}</td>
-                    <td>${item['Trường đào tạo'] || ''}</td>
-                    <td>${item['Mã ngành'] || ''}</td>
-                    <td>${item['Tên ngành'] || ''}</td>
-                    <td>${item['Tổ hợp môn'] || ''}</td>
-                    <td class="text-center ${diemClass}">${item['Điểm chuẩn 2024'] || ''}</td>
-                    <td>${item['Ghi chú'] || ''}</td>
+                  <th>Nhóm ngành</th>
+                  <th>Ngành</th>
+                  <th>Trường đào tạo</th>
+                  <th>Mã ngành</th>
+                  <th>Tên ngành</th>
+                  <th>Tổ hợp môn</th>
+                  <th>Điểm chuẩn 2024</th>
+                  <th>Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTable"></tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              Hiển thị <span id="resultRange">0-0</span> của
+              <span id="totalResults">0</span> kết quả
+            </div>
+            <nav>
+              <ul class="pagination" id="resultsPagination"></ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let searchState = {
+      page: 1,
+      limit: 20,
+      keyword: "",
+      truong: "",
+      nhomNganh: "",
+      toHopMon: "",
+      diemMin: "",
+      diemMax: "",
+      sortBy: "Điểm chuẩn 2024",
+      sortOrder: -1,
+    };
+
+    loadTruongDaoTao();
+    loadNhomNganh();
+    loadToHopMon();
+
+    document
+      .getElementById("advancedSearchForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        searchState.keyword = document.getElementById("keywordInput").value;
+        searchState.truong = document.getElementById("truongSelect").value;
+        searchState.nhomNganh =
+          document.getElementById("nhomNganhSelect").value;
+        searchState.toHopMon = document.getElementById("toHopMonSelect").value;
+        searchState.diemMin = document.getElementById("diemMinInput").value;
+        searchState.diemMax = document.getElementById("diemMaxInput").value;
+        searchState.sortBy = document.getElementById("sortBySelect").value;
+        searchState.sortOrder = parseInt(
+          document.getElementById("sortOrderSelect").value
+        );
+        searchState.page = 1;
+
+        performSearch();
+      });
+
+    document
+      .getElementById("advancedSearchForm")
+      .addEventListener("reset", function () {
+        searchState = {
+          page: 1,
+          limit: 20,
+          keyword: "",
+          truong: "",
+          nhomNganh: "",
+          toHopMon: "",
+          diemMin: "",
+          diemMax: "",
+          sortBy: "Điểm chuẩn 2024",
+          sortOrder: -1,
+        };
+
+        document.getElementById("searchResults").classList.add("d-none");
+      });
+
+    function performSearch() {
+      document.getElementById("searchResults").classList.remove("d-none");
+      document.getElementById("resultsTable").innerHTML =
+        '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
+
+      let url = `/api/diem-chuan?page=${searchState.page}&limit=${searchState.limit}&sort_by=${searchState.sortBy}&sort_order=${searchState.sortOrder}`;
+
+      if (searchState.keyword) {
+        url += `&search=${encodeURIComponent(searchState.keyword)}`;
+      }
+
+      if (searchState.truong) {
+        url += `&truong=${encodeURIComponent(searchState.truong)}`;
+      }
+
+      if (searchState.nhomNganh) {
+        url += `&nhom_nganh=${encodeURIComponent(searchState.nhomNganh)}`;
+      }
+
+      if (searchState.toHopMon) {
+        url += `&to_hop_mon=${encodeURIComponent(searchState.toHopMon)}`;
+      }
+
+      if (searchState.diemMin) {
+        url += `&diem_min=${encodeURIComponent(searchState.diemMin)}`;
+      }
+
+      if (searchState.diemMax) {
+        url += `&diem_max=${encodeURIComponent(searchState.diemMax)}`;
+      }
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          renderResults(data.data);
+          renderResultsPagination(data.page, data.total_pages, data.total);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("resultsTable").innerHTML =
+            '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+        });
+    }
+
+    function renderResults(data) {
+      const tableBody = document.getElementById("resultsTable");
+
+      if (data.length === 0) {
+        tableBody.innerHTML =
+          '<tr><td colspan="8" class="text-center">Không có kết quả phù hợp</td></tr>';
+        return;
+      }
+
+      let html = "";
+      data.forEach((item) => {
+        let diemClass = "";
+        const diem = parseFloat(item["Điểm chuẩn 2024"]);
+        if (!isNaN(diem)) {
+          if (diem >= 28) diemClass = "text-danger fw-bold";
+          else if (diem >= 25) diemClass = "text-warning fw-bold";
+          else if (diem >= 22) diemClass = "text-success fw-bold";
+        }
+
+        html += `
+                <tr>
+                    <td>${item["Nhóm ngành"] || ""}</td>
+                    <td>${item["Ngành"] || ""}</td>
+                    <td>${item["Trường đào tạo"] || ""}</td>
+                    <td>${item["Mã ngành"] || ""}</td>
+                    <td>${item["Tên ngành"] || ""}</td>
+                    <td>${item["Tổ hợp môn"] || ""}</td>
+                    <td class="text-center ${diemClass}">${
+          item["Điểm chuẩn 2024"] || ""
+        }</td>
+                    <td>${item["Ghi chú"] || ""}</td>
                 </tr>
                 `;
-            });
-            
-            tableBody.innerHTML = html;
-        }
-        
-        // Hàm hiển thị phân trang cho kết quả tìm kiếm
-        function renderResultsPagination(currentPage, totalPages, totalResults) {
-            const pagination = document.getElementById('resultsPagination');
-            const resultRange = document.getElementById('resultRange');
-            const totalResultsElement = document.getElementById('totalResults');
-            
-            // Hiển thị thông tin về phạm vi hiển thị
-            const start = (currentPage - 1) * searchState.limit + 1;
-            const end = Math.min(currentPage * searchState.limit, totalResults);
-            resultRange.textContent = `${start}-${end}`;
-            totalResultsElement.textContent = totalResults;
-            
-            // Tạo phân trang
-            let html = '';
-            
-            // Nút Previous
-            html += `
-            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage - 1}">Trước</a>
+      });
+
+      tableBody.innerHTML = html;
+    }
+
+    function renderResultsPagination(currentPage, totalPages, totalResults) {
+      const pagination = document.getElementById("resultsPagination");
+      const resultRange = document.getElementById("resultRange");
+      const totalResultsElement = document.getElementById("totalResults");
+
+      const start = (currentPage - 1) * searchState.limit + 1;
+      const end = Math.min(currentPage * searchState.limit, totalResults);
+      resultRange.textContent = `${start}-${end}`;
+      totalResultsElement.textContent = totalResults;
+
+      let html = "";
+
+      html += `
+            <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+                <a class="page-link" href="#" data-page="${
+                  currentPage - 1
+                }">Trước</a>
             </li>
             `;
-            
-            // Các trang
-            const maxPages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
-            let endPage = Math.min(totalPages, startPage + maxPages - 1);
-            
-            if (endPage - startPage + 1 < maxPages) {
-                startPage = Math.max(1, endPage - maxPages + 1);
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                html += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
+
+      const maxPages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+      let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+      if (endPage - startPage + 1 < maxPages) {
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+                <li class="page-item ${i === currentPage ? "active" : ""}">
                     <a class="page-link" href="#" data-page="${i}">${i}</a>
                 </li>
                 `;
-            }
-            
-            // Nút Next
-            html += `
-            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage + 1}">Sau</a>
+      }
+
+      html += `
+            <li class="page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }">
+                <a class="page-link" href="#" data-page="${
+                  currentPage + 1
+                }">Sau</a>
             </li>
             `;
-            
-            pagination.innerHTML = html;
-            
-            // Thêm sự kiện click cho các nút phân trang
-            document.querySelectorAll('#resultsPagination .page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = parseInt(this.getAttribute('data-page'));
-                    if (page >= 1 && page <= totalPages) {
-                        searchState.page = page;
-                        performSearch();
-                    }
-                });
-            });
-        }
-        
-        // Hàm tải danh sách trường đào tạo
-        function loadTruongDaoTao() {
-            fetch('/api/truong-dao-tao')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('truongSelect');
-                    data.sort().forEach(truong => {
-                        const option = document.createElement('option');
-                        option.value = truong;
-                        option.textContent = truong;
-                        select.appendChild(option);
-                    });
-                });
-        }
-        
-        // Hàm tải danh sách nhóm ngành
-        function loadNhomNganh() {
-            fetch('/api/nhom-nganh')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('nhomNganhSelect');
-                    data.sort().forEach(nhomNganh => {
-                        const option = document.createElement('option');
-                        option.value = nhomNganh;
-                        option.textContent = nhomNganh;
-                        select.appendChild(option);
-                    });
-                });
-        }
-        
-        // Hàm tải danh sách tổ hợp môn
-        function loadToHopMon() {
-            fetch('/api/to-hop-mon')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('toHopMonSelect');
-                    data.forEach(toHopMon => {
-                        const option = document.createElement('option');
-                        option.value = toHopMon;
-                        option.textContent = toHopMon;
-                        select.appendChild(option);
-                    });
-                });
-        }
-    });
+
+      pagination.innerHTML = html;
+
+      document
+        .querySelectorAll("#resultsPagination .page-link")
+        .forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const page = parseInt(this.getAttribute("data-page"));
+            if (page >= 1 && page <= totalPages) {
+              searchState.page = page;
+              performSearch();
+            }
+          });
+        });
+    }
+
+    function loadTruongDaoTao() {
+      fetch("/api/truong-dao-tao")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("truongSelect");
+          data.sort().forEach((truong) => {
+            const option = document.createElement("option");
+            option.value = truong;
+            option.textContent = truong;
+            select.appendChild(option);
+          });
+        });
+    }
+
+    function loadNhomNganh() {
+      fetch("/api/nhom-nganh")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("nhomNganhSelect");
+          data.sort().forEach((nhomNganh) => {
+            const option = document.createElement("option");
+            option.value = nhomNganh;
+            option.textContent = nhomNganh;
+            select.appendChild(option);
+          });
+        });
+    }
+
+    function loadToHopMon() {
+      fetch("/api/to-hop-mon")
+        .then((response) => response.json())
+        .then((data) => {
+          const select = document.getElementById("toHopMonSelect");
+          data.forEach((toHopMon) => {
+            const option = document.createElement("option");
+            option.value = toHopMon;
+            option.textContent = toHopMon;
+            select.appendChild(option);
+          });
+        });
+    }
+  });
 </script>
 {% endblock %}

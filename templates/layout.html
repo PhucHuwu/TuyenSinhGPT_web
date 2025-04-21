@@ -1,239 +1,251 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Điểm Chuẩn Đại Học 2024</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Điểm Chuẩn ĐH 2024</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/danh-muc">Danh mục</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/thong-ke">Thống kê</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tim-kiem-nang-cao">Tìm kiếm nâng cao</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/so-sanh">So sánh</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/chat">
-                            <i class="bi bi-chat-dots"></i> Chat với trợ lý
-                        </a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Điểm Chuẩn ĐH 2024</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Trang chủ</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/danh-muc">Danh mục</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/thong-ke">Thống kê</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/tim-kiem-nang-cao"
+                >Tìm kiếm nâng cao</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/so-sanh">So sánh</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/chat">
+                <i class="bi bi-chat-dots"></i> Chat với trợ lý
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-lg-3 col-xl-2 sidebar-container">
-                <div class="sidebar-toggle d-lg-none">
-                    <button class="btn btn-primary w-100 mb-2" id="sidebarToggle">
-                        <i class="bi bi-list"></i> Danh mục
-                    </button>
-                </div>
-                <div class="sidebar d-none d-lg-block" id="sidebar">
-                    <div class="sidebar-header">
-                        <h5>Danh mục</h5>
-                    </div>
-                    <div class="sidebar-content">
-                        <ul class="sidebar-menu" id="sidebarMenu">
-                            <li class="sidebar-item">
-                                <a href="/danh-muc" class="sidebar-link">
-                                    <i class="bi bi-grid"></i> Tất cả nhóm ngành
-                                </a>
-                            </li>
-                            <!-- Danh sách nhóm ngành sẽ được thêm vào đây bằng JavaScript -->
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Main content -->
-            <main class="col-lg-9 col-xl-10 ms-sm-auto px-md-4 mt-4 main-content">
-                {% block content %}{% endblock %}
-            </main>
-        </div>
-    </div>
-
-    <!-- Chat Icon -->
-    <div class="chat-icon" id="chatIcon">
-        <i class="bi bi-chat-dots-fill"></i>
-    </div>
-
-    <!-- Chat Widget -->
-    <div class="chat-widget" id="chatWidget">
-        <div class="chat-header">
-            <h5>Trợ lý tư vấn điểm chuẩn</h5>
-            <button class="btn-close" id="closeChatBtn"></button>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-message bot">
-                <div class="message-content">
-                    Xin chào! Tôi là trợ lý tư vấn điểm chuẩn đại học 2024. Bạn có thể hỏi tôi về điểm chuẩn, ngành học, trường đại học...
-                </div>
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Nhập câu hỏi của bạn..." class="form-control">
-            <button id="sendChatBtn" class="btn btn-primary">
-                <i class="bi bi-send"></i>
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-xl-2 sidebar-container">
+          <div class="sidebar-toggle d-lg-none">
+            <button class="btn btn-primary w-100 mb-2" id="sidebarToggle">
+              <i class="bi bi-list"></i> Danh mục
             </button>
+          </div>
+          <div class="sidebar d-none d-lg-block" id="sidebar">
+            <div class="sidebar-header">
+              <h5>Danh mục</h5>
+            </div>
+            <div class="sidebar-content">
+              <ul class="sidebar-menu" id="sidebarMenu">
+                <li class="sidebar-item">
+                  <a href="/danh-muc" class="sidebar-link">
+                    <i class="bi bi-grid"></i> Tất cả nhóm ngành
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+
+        <main class="col-lg-9 col-xl-10 ms-sm-auto px-md-4 mt-4 main-content">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <div class="chat-icon" id="chatIcon">
+      <i class="bi bi-chat-dots-fill"></i>
+    </div>
+
+    <div class="chat-widget" id="chatWidget">
+      <div class="chat-header">
+        <h5>Trợ lý tư vấn điểm chuẩn</h5>
+        <button class="btn-close" id="closeChatBtn"></button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-message bot">
+          <div class="message-content">
+            Xin chào! Tôi là trợ lý tư vấn điểm chuẩn đại học 2024. Bạn có thể
+            hỏi tôi về điểm chuẩn, ngành học, trường đại học...
+          </div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Nhập câu hỏi của bạn..."
+          class="form-control"
+        />
+        <button id="sendChatBtn" class="btn btn-primary">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
     </div>
 
     <footer class="bg-light text-center text-lg-start mt-5">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-            © 2024 Điểm Chuẩn Đại Học
-        </div>
+      <div
+        class="text-center p-3"
+        style="background-color: rgba(0, 0, 0, 0.05)"
+      >
+        © 2024 Điểm Chuẩn Đại Học
+      </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Xử lý hiển thị/ẩn sidebar trên màn hình nhỏ
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-            
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('d-none');
-                    sidebar.classList.toggle('d-block');
-                });
-            }
-            
-            // Tải danh sách nhóm ngành cho sidebar
-            fetch('/api/nhom-nganh')
-                .then(response => response.json())
-                .then(data => {
-                    const sidebarMenu = document.getElementById('sidebarMenu');
-                    
-                    // Thêm các nhóm ngành vào sidebar
-                    data.sort().forEach(nhomNganh => {
-                        if (nhomNganh) {
-                            const li = document.createElement('li');
-                            li.className = 'sidebar-item';
-                            li.innerHTML = `
-                                <a href="/nhom-nganh/${encodeURIComponent(nhomNganh)}" class="sidebar-link">
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const sidebar = document.getElementById("sidebar");
+
+        if (sidebarToggle) {
+          sidebarToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("d-none");
+            sidebar.classList.toggle("d-block");
+          });
+        }
+
+        fetch("/api/nhom-nganh")
+          .then((response) => response.json())
+          .then((data) => {
+            const sidebarMenu = document.getElementById("sidebarMenu");
+
+            data.sort().forEach((nhomNganh) => {
+              if (nhomNganh) {
+                const li = document.createElement("li");
+                li.className = "sidebar-item";
+                li.innerHTML = `
+                                <a href="/nhom-nganh/${encodeURIComponent(
+                                  nhomNganh
+                                )}" class="sidebar-link">
                                     <i class="bi bi-folder"></i> ${nhomNganh}
                                 </a>
                             `;
-                            sidebarMenu.appendChild(li);
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading sidebar menu:', error);
-                });
-                
-            // Xử lý chat widget
-            const chatIcon = document.getElementById('chatIcon');
-            const chatWidget = document.getElementById('chatWidget');
-            const closeChatBtn = document.getElementById('closeChatBtn');
-            const chatInput = document.getElementById('chatInput');
-            const sendChatBtn = document.getElementById('sendChatBtn');
-            const chatBody = document.getElementById('chatBody');
-            
-            // Hiển thị/ẩn chat widget
-            chatIcon.addEventListener('click', function() {
-                chatWidget.classList.toggle('active');
-                chatIcon.classList.toggle('hidden');
-                if (chatWidget.classList.contains('active')) {
-                    chatInput.focus();
-                }
+                sidebarMenu.appendChild(li);
+              }
             });
-            
-            closeChatBtn.addEventListener('click', function() {
-                chatWidget.classList.remove('active');
-                chatIcon.classList.remove('hidden');
-            });
-            
-            // Xử lý gửi tin nhắn
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    // Thêm tin nhắn của người dùng vào chat
-                    addMessage(message, 'user');
-                    
-                    // Hiển thị đang nhập
-                    addTypingIndicator();
-                    
-                    // Gửi tin nhắn đến server
-                    fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ question: message })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Xóa đang nhập
-                        removeTypingIndicator();
-                        
-                        // Thêm câu trả lời từ bot
-                        if (data.answer) {
-                            addMessage(data.answer, 'bot');
-                        } else if (data.error) {
-                            addMessage('Xin lỗi, đã xảy ra lỗi: ' + data.error, 'bot error');
-                        }
-                    })
-                    .catch(error => {
-                        // Xóa đang nhập
-                        removeTypingIndicator();
-                        
-                        // Thêm thông báo lỗi
-                        addMessage('Xin lỗi, đã xảy ra lỗi khi kết nối với server.', 'bot error');
-                        console.error('Error:', error);
-                    });
-                    
-                    // Xóa tin nhắn trong input
-                    chatInput.value = '';
+          })
+          .catch((error) => {
+            console.error("Error loading sidebar menu:", error);
+          });
+
+        const chatIcon = document.getElementById("chatIcon");
+        const chatWidget = document.getElementById("chatWidget");
+        const closeChatBtn = document.getElementById("closeChatBtn");
+        const chatInput = document.getElementById("chatInput");
+        const sendChatBtn = document.getElementById("sendChatBtn");
+        const chatBody = document.getElementById("chatBody");
+
+        chatIcon.addEventListener("click", function () {
+          chatWidget.classList.toggle("active");
+          chatIcon.classList.toggle("hidden");
+          if (chatWidget.classList.contains("active")) {
+            chatInput.focus();
+          }
+        });
+
+        closeChatBtn.addEventListener("click", function () {
+          chatWidget.classList.remove("active");
+          chatIcon.classList.remove("hidden");
+        });
+
+        function sendMessage() {
+          const message = chatInput.value.trim();
+          if (message) {
+            addMessage(message, "user");
+
+            addTypingIndicator();
+
+            fetch("/api/chat", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ question: message }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                removeTypingIndicator();
+
+                if (data.answer) {
+                  addMessage(data.answer, "bot");
+                } else if (data.error) {
+                  addMessage(
+                    "Xin lỗi, đã xảy ra lỗi: " + data.error,
+                    "bot error"
+                  );
                 }
-            }
-            
-            // Thêm tin nhắn vào chat
-            function addMessage(message, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `chat-message ${sender}`;
-                messageDiv.innerHTML = `
+              })
+              .catch((error) => {
+                removeTypingIndicator();
+
+                addMessage(
+                  "Xin lỗi, đã xảy ra lỗi khi kết nối với server.",
+                  "bot error"
+                );
+                console.error("Error:", error);
+              });
+
+            chatInput.value = "";
+          }
+        }
+
+        function addMessage(message, sender) {
+          const messageDiv = document.createElement("div");
+          messageDiv.className = `chat-message ${sender}`;
+          messageDiv.innerHTML = `
                     <div class="message-content">
                         ${message}
                     </div>
                 `;
-                chatBody.appendChild(messageDiv);
-                
-                // Cuộn xuống dưới
-                chatBody.scrollTop = chatBody.scrollHeight;
-            }
-            
-            // Thêm chỉ báo đang nhập
-            function addTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'chat-message bot typing';
-                typingDiv.id = 'typingIndicator';
-                typingDiv.innerHTML = `
+          chatBody.appendChild(messageDiv);
+
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+          const typingDiv = document.createElement("div");
+          typingDiv.className = "chat-message bot typing";
+          typingDiv.id = "typingIndicator";
+          typingDiv.innerHTML = `
                     <div class="message-content">
                         <div class="typing-indicator">
                             <span></span>
@@ -242,33 +254,29 @@
                         </div>
                     </div>
                 `;
-                chatBody.appendChild(typingDiv);
-                
-                // Cuộn xuống dưới
-                chatBody.scrollTop = chatBody.scrollHeight;
-            }
-            
-            // Xóa chỉ báo đang nhập
-            function removeTypingIndicator() {
-                const typingIndicator = document.getElementById('typingIndicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
-            
-            // Xử lý sự kiện click nút gửi
-            sendChatBtn.addEventListener('click', sendMessage);
-            
-            // Xử lý sự kiện nhấn Enter trong input
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+          chatBody.appendChild(typingDiv);
+
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+          const typingIndicator = document.getElementById("typingIndicator");
+          if (typingIndicator) {
+            typingIndicator.remove();
+          }
+        }
+
+        sendChatBtn.addEventListener("click", sendMessage);
+
+        chatInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
         });
+      });
     </script>
-    
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>

@@ -1,73 +1,70 @@
-{% extends 'layout.html' %}
-
-{% block content %}
+{% extends 'layout.html' %} {% block content %}
 <div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Danh mục nhóm ngành</h5>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Danh mục nhóm ngành</h5>
+      </div>
+      <div class="card-body">
+        <div class="row" id="nhomNganhContainer">
+          <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Đang tải...</span>
             </div>
-            <div class="card-body">
-                <div class="row" id="nhomNganhContainer">
-                    <div class="col-12 text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Đang tải...</span>
-                        </div>
-                        <p>Đang tải dữ liệu...</p>
-                    </div>
-                </div>
-            </div>
+            <p>Đang tải dữ liệu...</p>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Tải danh sách nhóm ngành
-        fetch('/api/nhom-nganh')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('nhomNganhContainer');
-                container.innerHTML = '';
-                
-                // Tạo thẻ cho mỗi nhóm ngành
-                data.sort().forEach(nhomNganh => {
-                    if (nhomNganh) {
-                        // Tạo một màu ngẫu nhiên cho mỗi nhóm ngành
-                        const colors = ['primary', 'success', 'danger', 'warning', 'info'];
-                        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                        
-                        const col = document.createElement('div');
-                        col.className = 'col-md-4 col-lg-3 mb-4';
-                        col.innerHTML = `
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/nhom-nganh")
+      .then((response) => response.json())
+      .then((data) => {
+        const container = document.getElementById("nhomNganhContainer");
+        container.innerHTML = "";
+
+        data.sort().forEach((nhomNganh) => {
+          if (nhomNganh) {
+            const colors = ["primary", "success", "danger", "warning", "info"];
+            const randomColor =
+              colors[Math.floor(Math.random() * colors.length)];
+
+            const col = document.createElement("div");
+            col.className = "col-md-4 col-lg-3 mb-4";
+            col.innerHTML = `
                             <div class="card h-100 category-card">
                                 <div class="card-body text-center">
                                     <div class="category-icon text-${randomColor}">
                                         <i class="bi bi-folder2-open"></i>
                                     </div>
                                     <h5 class="card-title">${nhomNganh}</h5>
-                                    <a href="/nhom-nganh/${encodeURIComponent(nhomNganh)}" class="btn btn-sm btn-outline-${randomColor} mt-2">
+                                    <a href="/nhom-nganh/${encodeURIComponent(
+                                      nhomNganh
+                                    )}" class="btn btn-sm btn-outline-${randomColor} mt-2">
                                         Xem chi tiết
                                     </a>
                                 </div>
                             </div>
                         `;
-                        container.appendChild(col);
-                    }
-                });
-                
-                // Nếu không có dữ liệu
-                if (data.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center">Không có dữ liệu nhóm ngành</div>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const container = document.getElementById('nhomNganhContainer');
-                container.innerHTML = '<div class="col-12 text-center text-danger">Lỗi khi tải dữ liệu</div>';
-            });
-    });
+            container.appendChild(col);
+          }
+        });
+
+        if (data.length === 0) {
+          container.innerHTML =
+            '<div class="col-12 text-center">Không có dữ liệu nhóm ngành</div>';
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        const container = document.getElementById("nhomNganhContainer");
+        container.innerHTML =
+          '<div class="col-12 text-center text-danger">Lỗi khi tải dữ liệu</div>';
+      });
+  });
 </script>
 {% endblock %}
