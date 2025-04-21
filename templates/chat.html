@@ -1,0 +1,275 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Chat với Trợ lý Tư vấn Điểm chuẩn</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="chat-container">
+                            <div class="chat-messages" id="fullChatMessages">
+                                <div class="chat-message bot">
+                                    <div class="message-content">
+                                        <p>Xin chào! Tôi là trợ lý tư vấn điểm chuẩn đại học 2024.</p>
+                                        <p>Bạn có thể hỏi tôi về:</p>
+                                        <ul>
+                                            <li>Điểm chuẩn của các trường đại học</li>
+                                            <li>Thông tin về các ngành học</li>
+                                            <li>Tư vấn chọn ngành, chọn trường</li>
+                                            <li>Các tổ hợp môn xét tuyển</li>
+                                            <li>Và nhiều thông tin khác về tuyển sinh đại học</li>
+                                        </ul>
+                                        <p>Hãy đặt câu hỏi để bắt đầu!</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <div class="input-group">
+                                    <input type="text" id="fullChatInput" class="form-control" placeholder="Nhập câu hỏi của bạn...">
+                                    <button class="btn btn-primary" id="fullSendBtn">
+                                        <i class="bi bi-send"></i> Gửi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Câu hỏi thường gặp</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Điểm chuẩn</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="#" class="faq-link">Điểm chuẩn cao nhất năm 2024?</a></li>
+                                    <li><a href="#" class="faq-link">Điểm chuẩn ngành Công nghệ thông tin?</a></li>
+                                    <li><a href="#" class="faq-link">Điểm chuẩn các trường top đầu?</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Ngành học</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="#" class="faq-link">Ngành nào có điểm chuẩn thấp nhất?</a></li>
+                                    <li><a href="#" class="faq-link">Ngành nào có triển vọng việc làm tốt?</a></li>
+                                    <li><a href="#" class="faq-link">Tôi thích CNTT nên học trường nào?</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Tư vấn chọn trường</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="#" class="faq-link">Tôi được 24 điểm khối A nên học ngành gì?</a></li>
+                                    <li><a href="#" class="faq-link">So sánh ngành Y và Dược?</a></li>
+                                    <li><a href="#" class="faq-link">Các trường đào tạo ngành Luật tốt nhất?</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+    }
+    
+    .chat-input-container {
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+        background-color: white;
+    }
+    
+    .chat-message {
+        margin-bottom: 15px;
+        max-width: 80%;
+    }
+    
+    .chat-message.user {
+        margin-left: auto;
+    }
+    
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 18px;
+        display: inline-block;
+    }
+    
+    .chat-message.user .message-content {
+        background-color: #0d6efd;
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .chat-message.bot .message-content {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-bottom-left-radius: 5px;
+    }
+    
+    .faq-link {
+        color: #0d6efd;
+        text-decoration: none;
+        display: block;
+        padding: 5px 0;
+    }
+    
+    .faq-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('fullChatMessages');
+        const chatInput = document.getElementById('fullChatInput');
+        const sendBtn = document.getElementById('fullSendBtn');
+        const faqLinks = document.querySelectorAll('.faq-link');
+        
+        // Xử lý gửi tin nhắn
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                // Thêm tin nhắn của người dùng vào chat
+                addMessage(message, 'user');
+                
+                // Hiển thị đang nhập
+                addTypingIndicator();
+                
+                // Gửi tin nhắn đến server
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Xóa đang nhập
+                    removeTypingIndicator();
+                    
+                    // Thêm câu trả lời từ bot
+                    if (data.answer) {
+                        addMessage(data.answer, 'bot');
+                    } else if (data.error) {
+                        addMessage('Xin lỗi, đã xảy ra lỗi: ' + data.error, 'bot error');
+                    }
+                })
+                .catch(error => {
+                    // Xóa đang nhập
+                    removeTypingIndicator();
+                    
+                    // Thêm thông báo lỗi
+                    addMessage('Xin lỗi, đã xảy ra lỗi khi kết nối với server.', 'bot error');
+                    console.error('Error:', error);
+                });
+                
+                // Xóa tin nhắn trong input
+                chatInput.value = '';
+            }
+        }
+        
+        // Thêm tin nhắn vào chat
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${message}
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            
+            // Cuộn xuống dưới
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Thêm chỉ báo đang nhập
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot typing';
+            typingDiv.id = 'fullTypingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            
+            // Cuộn xuống dưới
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Xóa chỉ báo đang nhập
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('fullTypingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Xử lý sự kiện click nút gửi
+        sendBtn.addEventListener('click', sendMessage);
+        
+        // Xử lý sự kiện nhấn Enter trong input
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Xử lý sự kiện click vào câu hỏi thường gặp
+        faqLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const question = this.textContent;
+                chatInput.value = question;
+                sendMessage();
+            });
+        });
+    });
+</script>
+{% endblock %}

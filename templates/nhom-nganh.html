@@ -1,0 +1,265 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/danh-muc">Danh mục</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ nhom_nganh }}</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Ngành thuộc nhóm: {{ nhom_nganh }}</h5>
+                <a href="/danh-muc" class="btn btn-sm btn-light">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm ngành...">
+                            <button class="btn btn-primary" id="searchBtn">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" id="nganhContainer">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p>Đang tải dữ liệu...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Thống kê điểm chuẩn theo ngành</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="nganhChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nhomNganh = "{{ nhom_nganh }}";
+        let nganhChart = null;
+        
+        // Tải danh sách ngành thuộc nhóm ngành
+        function loadNganh(search = '') {
+            const container = document.getElementById('nganhContainer');
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p>Đang tải dữ liệu...</p>
+                </div>
+            `;
+            
+            // Gọi API để lấy danh sách ngành
+            fetch(`/api/nganh?nhom_nganh=${encodeURIComponent(nhomNganh)}`)
+                .then(response => response.json())
+                .then(data => {
+                    container.innerHTML = '';
+                    
+                    // Lọc theo từ khóa tìm kiếm nếu có
+                    let filteredData = data;
+                    if (search) {
+                        const searchLower = search.toLowerCase();
+                        filteredData = data.filter(nganh => 
+                            nganh && nganh.toLowerCase().includes(searchLower)
+                        );
+                    }
+                    
+                    // Sắp xếp theo tên ngành
+                    filteredData.sort();
+                    
+                    // Tạo thẻ cho mỗi ngành
+                    filteredData.forEach(nganh => {
+                        if (nganh) {
+                            // Tạo một màu ngẫu nhiên cho mỗi ngành
+                            const colors = ['primary', 'success', 'danger', 'warning', 'info'];
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            
+                            const col = document.createElement('div');
+                            col.className = 'col-md-4 col-lg-3 mb-4';
+                            col.innerHTML = `
+                                <div class="card h-100 category-card">
+                                    <div class="card-body text-center">
+                                        <div class="category-icon text-${randomColor}">
+                                            <i class="bi bi-journal-text"></i>
+                                        </div>
+                                        <h5 class="card-title">${nganh}</h5>
+                                        <a href="/nganh/${encodeURIComponent(nganh)}" class="btn btn-sm btn-outline-${randomColor} mt-2">
+                                            Xem chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(col);
+                        }
+                    });
+                    
+                    // Nếu không có dữ liệu
+                    if (filteredData.length === 0) {
+                        container.innerHTML = '<div class="col-12 text-center">Không tìm thấy ngành nào</div>';
+                    }
+                    
+                    // Tải dữ liệu cho biểu đồ
+                    loadNganhChart();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    container.innerHTML = '<div class="col-12 text-center text-danger">Lỗi khi tải dữ liệu</div>';
+                });
+        }
+        
+        // Tải biểu đồ thống kê điểm chuẩn theo ngành
+        function loadNganhChart() {
+            fetch(`/api/diem-chuan?nhom_nganh=${encodeURIComponent(nhomNganh)}&limit=1000`)
+                .then(response => response.json())
+                .then(data => {
+                    // Nhóm dữ liệu theo ngành và tính điểm trung bình
+                    const nganhStats = {};
+                    
+                    data.data.forEach(item => {
+                        const nganh = item['Ngành'];
+                        const diem = parseFloat(item['Điểm chuẩn 2024']);
+                        
+                        if (nganh && !isNaN(diem)) {
+                            if (!nganhStats[nganh]) {
+                                nganhStats[nganh] = {
+                                    total: diem,
+                                    count: 1,
+                                    max: diem,
+                                    min: diem
+                                };
+                            } else {
+                                nganhStats[nganh].total += diem;
+                                nganhStats[nganh].count += 1;
+                                nganhStats[nganh].max = Math.max(nganhStats[nganh].max, diem);
+                                nganhStats[nganh].min = Math.min(nganhStats[nganh].min, diem);
+                            }
+                        }
+                    });
+                    
+                    // Chuyển đổi dữ liệu cho biểu đồ
+                    const labels = [];
+                    const avgData = [];
+                    const maxData = [];
+                    const minData = [];
+                    
+                    for (const nganh in nganhStats) {
+                        labels.push(nganh);
+                        avgData.push((nganhStats[nganh].total / nganhStats[nganh].count).toFixed(2));
+                        maxData.push(nganhStats[nganh].max.toFixed(2));
+                        minData.push(nganhStats[nganh].min.toFixed(2));
+                    }
+                    
+                    // Vẽ biểu đồ
+                    const ctx = document.getElementById('nganhChart').getContext('2d');
+                    
+                    // Nếu đã có biểu đồ, hủy nó
+                    if (nganhChart) {
+                        nganhChart.destroy();
+                    }
+                    
+                    // Tạo biểu đồ mới
+                    nganhChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Điểm trung bình',
+                                    data: avgData,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Điểm cao nhất',
+                                    data: maxData,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Điểm thấp nhất',
+                                    data: minData,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Thống kê điểm chuẩn các ngành thuộc nhóm ${nhomNganh}`
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    min: 15,
+                                    max: 30
+                                },
+                                x: {
+                                    ticks: {
+                                        autoSkip: false,
+                                        maxRotation: 90,
+                                        minRotation: 45
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        
+        // Xử lý sự kiện tìm kiếm
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const searchValue = document.getElementById('searchInput').value;
+            loadNganh(searchValue);
+        });
+        
+        // Xử lý sự kiện nhấn Enter trong ô tìm kiếm
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchValue = this.value;
+                loadNganh(searchValue);
+            }
+        });
+        
+        // Tải dữ liệu ban đầu
+        loadNganh();
+    });
+</script>
+{% endblock %}

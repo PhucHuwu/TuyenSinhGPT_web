@@ -1,0 +1,149 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thống kê Điểm Chuẩn Theo Trường</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <canvas id="diemTrungBinhChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="table-responsive mt-4">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Trường đào tạo</th>
+                                <th class="text-center">Điểm trung bình</th>
+                                <th class="text-center">Điểm cao nhất</th>
+                                <th class="text-center">Điểm thấp nhất</th>
+                                <th class="text-center">Số ngành</th>
+                            </tr>
+                        </thead>
+                        <tbody id="thongKeTable">
+                            <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tải dữ liệu thống kê
+        fetch('/api/thong-ke/truong')
+            .then(response => response.json())
+            .then(data => {
+                renderThongKeTable(data);
+                renderChart(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        // Hàm hiển thị bảng thống kê
+        function renderThongKeTable(data) {
+            const tableBody = document.getElementById('thongKeTable');
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                <tr>
+                    <td>${item._id || ''}</td>
+                    <td class="text-center">${item.diem_trung_binh.toFixed(2)}</td>
+                    <td class="text-center">${item.diem_cao_nhat.toFixed(2)}</td>
+                    <td class="text-center">${item.diem_thap_nhat.toFixed(2)}</td>
+                    <td class="text-center">${item.so_nganh}</td>
+                </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+        }
+
+        // Hàm vẽ biểu đồ
+        function renderChart(data) {
+            // Lấy 15 trường có điểm trung bình cao nhất
+            const top15 = data.slice(0, 15);
+            
+            const labels = top15.map(item => item._id);
+            const diemTrungBinh = top15.map(item => item.diem_trung_binh);
+            const diemCaoNhat = top15.map(item => item.diem_cao_nhat);
+            const diemThapNhat = top15.map(item => item.diem_thap_nhat);
+            
+            const ctx = document.getElementById('diemTrungBinhChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Điểm trung bình',
+                            data: diemTrungBinh,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Điểm cao nhất',
+                            data: diemCaoNhat,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Điểm thấp nhất',
+                            data: diemThapNhat,
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '15 Trường có điểm chuẩn trung bình cao nhất',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 15,
+                            max: 30
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,582 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">So sánh điểm chuẩn</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">So sánh theo trường</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn các trường để so sánh</label>
+                                    <select id="truongCompareSelect" class="form-select" multiple size="5">
+                                        <!-- Danh sách trường sẽ được thêm vào đây -->
+                                    </select>
+                                    <div class="form-text">Giữ Ctrl để chọn nhiều trường (tối đa 5)</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn nhóm ngành (tùy chọn)</label>
+                                    <select id="nhomNganhCompareSelect" class="form-select">
+                                        <option value="">Tất cả nhóm ngành</option>
+                                        <!-- Danh sách nhóm ngành sẽ được thêm vào đây -->
+                                    </select>
+                                </div>
+                                <button id="compareTruongBtn" class="btn btn-primary w-100">
+                                    <i class="bi bi-bar-chart-line"></i> So sánh trường
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">So sánh theo ngành</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn nhóm ngành</label>
+                                    <select id="nhomNganhSelect" class="form-select">
+                                        <option value="">Chọn nhóm ngành</option>
+                                        <!-- Danh sách nhóm ngành sẽ được thêm vào đây -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn các ngành để so sánh</label>
+                                    <select id="nganhCompareSelect" class="form-select" multiple size="5" disabled>
+                                        <option value="">Vui lòng chọn nhóm ngành trước</option>
+                                    </select>
+                                    <div class="form-text">Giữ Ctrl để chọn nhiều ngành (tối đa 5)</div>
+                                </div>
+                                <button id="compareNganhBtn" class="btn btn-primary w-100" disabled>
+                                    <i class="bi bi-bar-chart-line"></i> So sánh ngành
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="compareResults" class="d-none">
+                    <h5 class="mb-3">Kết quả so sánh</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0" id="compareChartTitle">Biểu đồ so sánh</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="compareChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Thống kê</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Tên</th>
+                                                <th class="text-end">Điểm TB</th>
+                                                <th class="text-end">Cao nhất</th>
+                                                <th class="text-end">Thấp nhất</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="compareStatsTable">
+                                            <!-- Dữ liệu thống kê sẽ được thêm vào đây -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-primary" id="compareTableHead">
+                                <!-- Header của bảng sẽ được thêm vào đây -->
+                            </thead>
+                            <tbody id="compareTableBody">
+                                <!-- Dữ liệu so sánh sẽ được thêm vào đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Biến lưu trữ biểu đồ
+        let compareChart = null;
+        
+        //  function() {
+        // Biến lưu trữ biểu đồ
+        let compareChart = null;
+        
+        // Tải dữ liệu cho các dropdown
+        loadTruongDaoTao();
+        loadNhomNganh();
+        
+        // Xử lý sự kiện thay đổi nhóm ngành
+        document.getElementById('nhomNganhSelect').addEventListener('change', function() {
+            const nhomNganh = this.value;
+            const nganhSelect = document.getElementById('nganhCompareSelect');
+            
+            // Reset select ngành
+            nganhSelect.innerHTML = '';
+            nganhSelect.disabled = true;
+            document.getElementById('compareNganhBtn').disabled = true;
+            
+            if (!nhomNganh) return;
+            
+            // Tải danh sách ngành theo nhóm ngành
+            fetch(`/api/diem-chuan?nhom_nganh=${encodeURIComponent(nhomNganh)}&limit=1000`)
+                .then(response => response.json())
+                .then(data => {
+                    // Lấy danh sách ngành duy nhất
+                    const nganhs = [...new Set(data.data.map(item => item['Ngành']))].filter(Boolean).sort();
+                    
+                    if (nganhs.length > 0) {
+                        nganhSelect.disabled = false;
+                        document.getElementById('compareNganhBtn').disabled = false;
+                        
+                        nganhs.forEach(nganh => {
+                            const option = document.createElement('option');
+                            option.value = nganh;
+                            option.textContent = nganh;
+                            nganhSelect.appendChild(option);
+                        });
+                    } else {
+                        nganhSelect.innerHTML = '<option value="">Không có ngành nào</option>';
+                    }
+                });
+        });
+        
+        // Xử lý sự kiện so sánh trường
+        document.getElementById('compareTruongBtn').addEventListener('click', function() {
+            const selectedTruongs = Array.from(document.getElementById('truongCompareSelect').selectedOptions).map(option => option.value);
+            const nhomNganh = document.getElementById('nhomNganhCompareSelect').value;
+            
+            if (selectedTruongs.length === 0) {
+                alert('Vui lòng chọn ít nhất một trường để so sánh');
+                return;
+            }
+            
+            if (selectedTruongs.length > 5) {
+                alert('Vui lòng chọn tối đa 5 trường để so sánh');
+                return;
+            }
+            
+            // Thực hiện so sánh
+            compareTruongs(selectedTruongs, nhomNganh);
+        });
+        
+        // Xử lý sự kiện so sánh ngành
+        document.getElementById('compareNganhBtn').addEventListener('click', function() {
+            const selectedNganhs = Array.from(document.getElementById('nganhCompareSelect').selectedOptions).map(option => option.value);
+            
+            if (selectedNganhs.length === 0) {
+                alert('Vui lòng chọn ít nhất một ngành để so sánh');
+                return;
+            }
+            
+            if (selectedNganhs.length > 5) {
+                alert('Vui lòng chọn tối đa 5 ngành để so sánh');
+                return;
+            }
+            
+            // Thực hiện so sánh
+            compareNganhs(selectedNganhs);
+        });
+        
+        // Hàm so sánh trường
+        function compareTruongs(truongs, nhomNganh) {
+            // Hiển thị loading
+            document.getElementById('compareResults').classList.remove('d-none');
+            document.getElementById('compareTableBody').innerHTML = '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
+            
+            // Xây dựng các promises cho mỗi trường
+            const promises = truongs.map(truong => {
+                let url = `/api/diem-chuan?truong=${encodeURIComponent(truong)}&limit=1000`;
+                
+                if (nhomNganh) {
+                    url += `&nhom_nganh=${encodeURIComponent(nhomNganh)}`;
+                }
+                
+                return fetch(url).then(response => response.json());
+            });
+            
+            // Thực hiện tất cả các promises
+            Promise.all(promises)
+                .then(results => {
+                    // Chuẩn bị dữ liệu cho biểu đồ
+                    const chartData = {
+                        labels: truongs,
+                        datasets: [
+                            {
+                                label: 'Điểm trung bình',
+                                data: results.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? (diems.reduce((a, b) => a + b, 0) / diems.length).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Điểm cao nhất',
+                                data: results.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? Math.max(...diems).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Điểm thấp nhất',
+                                data: results.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? Math.min(...diems).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    };
+                    
+                    // Vẽ biểu đồ
+                    renderCompareChart(chartData, 'So sánh điểm chuẩn giữa các trường');
+                    
+                    // Hiển thị bảng thống kê
+                    renderCompareStats(truongs, chartData.datasets);
+                    
+                    // Hiển thị bảng dữ liệu chi tiết
+                    renderTruongCompareTable(truongs, results);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('compareTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+                });
+        }
+        
+        // Hàm so sánh ngành
+        function compareNganhs(nganhs) {
+            // Hiển thị loading
+            document.getElementById('compareResults').classList.remove('d-none');
+            document.getElementById('compareTableBody').innerHTML = '<tr><td colspan="8" class="text-center">Đang tải dữ liệu...</td></tr>';
+            
+            // Xây dựng các promises cho mỗi ngành
+            const promises = nganhs.map(nganh => {
+                const url = `/api/diem-chuan?search=${encodeURIComponent(nganh)}&limit=1000`;
+                return fetch(url).then(response => response.json());
+            });
+            
+            // Thực hiện tất cả các promises
+            Promise.all(promises)
+                .then(results => {
+                    // Lọc dữ liệu để chỉ lấy các bản ghi có Ngành đúng với ngành đã chọn
+                    const filteredResults = results.map((result, index) => {
+                        return {
+                            ...result,
+                            data: result.data.filter(item => item['Ngành'] === nganhs[index])
+                        };
+                    });
+                    
+                    // Chuẩn bị dữ liệu cho biểu đồ
+                    const chartData = {
+                        labels: nganhs,
+                        datasets: [
+                            {
+                                label: 'Điểm trung bình',
+                                data: filteredResults.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? (diems.reduce((a, b) => a + b, 0) / diems.length).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Điểm cao nhất',
+                                data: filteredResults.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? Math.max(...diems).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Điểm thấp nhất',
+                                data: filteredResults.map(result => {
+                                    const diems = result.data.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                                    return diems.length > 0 ? Math.min(...diems).toFixed(2) : 0;
+                                }),
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    };
+                    
+                    // Vẽ biểu đồ
+                    renderCompareChart(chartData, 'So sánh điểm chuẩn giữa các ngành');
+                    
+                    // Hiển thị bảng thống kê
+                    renderCompareStats(nganhs, chartData.datasets);
+                    
+                    // Hiển thị bảng dữ liệu chi tiết
+                    renderNganhCompareTable(nganhs, filteredResults);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('compareTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+                });
+        }
+        
+        // Hàm vẽ biểu đồ so sánh
+        function renderCompareChart(data, title) {
+            const ctx = document.getElementById('compareChart').getContext('2d');
+            
+            // Nếu đã có biểu đồ, hủy nó
+            if (compareChart) {
+                compareChart.destroy();
+            }
+            
+            // Cập nhật tiêu đề
+            document.getElementById('compareChartTitle').textContent = title;
+            
+            // Tạo biểu đồ mới
+            compareChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 15,
+                            max: 30
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Hàm hiển thị bảng thống kê
+        function renderCompareStats(labels, datasets) {
+            const tableBody = document.getElementById('compareStatsTable');
+            let html = '';
+            
+            for (let i = 0; i < labels.length; i++) {
+                html += `
+                <tr>
+                    <td>${labels[i]}</td>
+                    <td class="text-end">${datasets[0].data[i]}</td>
+                    <td class="text-end">${datasets[1].data[i]}</td>
+                    <td class="text-end">${datasets[2].data[i]}</td>
+                </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = html;
+        }
+        
+        // Hàm hiển thị bảng so sánh trường
+        function renderTruongCompareTable(truongs, results) {
+            const tableHead = document.getElementById('compareTableHead');
+            const tableBody = document.getElementById('compareTableBody');
+            
+            // Tạo header cho bảng
+            let headHtml = '<tr><th>Ngành</th>';
+            truongs.forEach(truong => {
+                headHtml += `<th>${truong}</th>`;
+            });
+            headHtml += '</tr>';
+            tableHead.innerHTML = headHtml;
+            
+            // Tìm tất cả các ngành duy nhất từ tất cả các trường
+            const allNganhs = new Set();
+            results.forEach(result => {
+                result.data.forEach(item => {
+                    if (item['Ngành']) {
+                        allNganhs.add(item['Ngành']);
+                    }
+                });
+            });
+            
+            // Sắp xếp các ngành
+            const sortedNganhs = Array.from(allNganhs).sort();
+            
+            // Tạo body cho bảng
+            let bodyHtml = '';
+            sortedNganhs.forEach(nganh => {
+                bodyHtml += `<tr><td>${nganh}</td>`;
+                
+                truongs.forEach((truong, index) => {
+                    // Tìm điểm chuẩn của ngành này ở trường hiện tại
+                    const nganhData = results[index].data.filter(item => item['Ngành'] === nganh);
+                    
+                    if (nganhData.length > 0) {
+                        // Tính điểm trung bình nếu có nhiều bản ghi
+                        const diems = nganhData.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                        const avgDiem = diems.length > 0 ? (diems.reduce((a, b) => a + b, 0) / diems.length).toFixed(2) : 'N/A';
+                        
+                        // Xác định class cho điểm chuẩn
+                        let diemClass = '';
+                        if (avgDiem !== 'N/A') {
+                            const diem = parseFloat(avgDiem);
+                            if (diem >= 28) diemClass = 'text-danger fw-bold';
+                            else if (diem >= 25) diemClass = 'text-warning fw-bold';
+                            else if (diem >= 22) diemClass = 'text-success fw-bold';
+                        }
+                        
+                        bodyHtml += `<td class="text-center ${diemClass}">${avgDiem}</td>`;
+                    } else {
+                        bodyHtml += '<td class="text-center">-</td>';
+                    }
+                });
+                
+                bodyHtml += '</tr>';
+            });
+            
+            tableBody.innerHTML = bodyHtml;
+        }
+        
+        // Hàm hiển thị bảng so sánh ngành
+        function renderNganhCompareTable(nganhs, results) {
+            const tableHead = document.getElementById('compareTableHead');
+            const tableBody = document.getElementById('compareTableBody');
+            
+            // Tạo header cho bảng
+            let headHtml = '<tr><th>Trường đào tạo</th>';
+            nganhs.forEach(nganh => {
+                headHtml += `<th>${nganh}</th>`;
+            });
+            headHtml += '</tr>';
+            tableHead.innerHTML = headHtml;
+            
+            // Tìm tất cả các trường duy nhất từ tất cả các ngành
+            const allTruongs = new Set();
+            results.forEach(result => {
+                result.data.forEach(item => {
+                    if (item['Trường đào tạo']) {
+                        allTruongs.add(item['Trường đào tạo']);
+                    }
+                });
+            });
+            
+            // Sắp xếp các trường
+            const sortedTruongs = Array.from(allTruongs).sort();
+            
+            // Tạo body cho bảng
+            let bodyHtml = '';
+            sortedTruongs.forEach(truong => {
+                bodyHtml += `<tr><td>${truong}</td>`;
+                
+                nganhs.forEach((nganh, index) => {
+                    // Tìm điểm chuẩn của trường này ở ngành hiện tại
+                    const truongData = results[index].data.filter(item => item['Trường đào tạo'] === truong);
+                    
+                    if (truongData.length > 0) {
+                        // Tính điểm trung bình nếu có nhiều bản ghi
+                        const diems = truongData.map(item => parseFloat(item['Điểm chuẩn 2024'])).filter(diem => !isNaN(diem));
+                        const avgDiem = diems.length > 0 ? (diems.reduce((a, b) => a + b, 0) / diems.length).toFixed(2) : 'N/A';
+                        
+                        // Xác định class cho điểm chuẩn
+                        let diemClass = '';
+                        if (avgDiem !== 'N/A') {
+                            const diem = parseFloat(avgDiem);
+                            if (diem >= 28) diemClass = 'text-danger fw-bold';
+                            else if (diem >= 25) diemClass = 'text-warning fw-bold';
+                            else if (diem >= 22) diemClass = 'text-success fw-bold';
+                        }
+                        
+                        bodyHtml += `<td class="text-center ${diemClass}">${avgDiem}</td>`;
+                    } else {
+                        bodyHtml += '<td class="text-center">-</td>';
+                    }
+                });
+                
+                bodyHtml += '</tr>';
+            });
+            
+            tableBody.innerHTML = bodyHtml;
+        }
+        
+        // Hàm tải danh sách trường đào tạo
+        function loadTruongDaoTao() {
+            fetch('/api/truong-dao-tao')
+                .then(response => response.json())
+                .then(data => {
+                    const truongSelect = document.getElementById('truongCompareSelect');
+                    const truongFilterSelect = document.getElementById('truongCompareSelect');
+                    
+                    data.sort().forEach(truong => {
+                        // Thêm vào select so sánh trường
+                        const option1 = document.createElement('option');
+                        option1.value = truong;
+                        option1.textContent = truong;
+                        truongSelect.appendChild(option1);
+                        
+                        // Thêm vào select lọc nhóm ngành
+                        const option2 = document.createElement('option');
+                        option2.value = truong;
+                        option2.textContent = truong;
+                        if (truongFilterSelect) {
+                            truongFilterSelect.appendChild(option2);
+                        }
+                    });
+                });
+        }
+        
+        // Hàm tải danh sách nhóm ngành
+        function loadNhomNganh() {
+            fetch('/api/nhom-nganh')
+                .then(response => response.json())
+                .then(data => {
+                    const nhomNganhSelect = document.getElementById('nhomNganhSelect');
+                    const nhomNganhCompareSelect = document.getElementById('nhomNganhCompareSelect');
+                    
+                    data.sort().forEach(nhomNganh => {
+                        // Thêm vào select nhóm ngành
+                        const option1 = document.createElement('option');
+                        option1.value = nhomNganh;
+                        option1.textContent = nhomNganh;
+                        nhomNganhSelect.appendChild(option1);
+                        
+                        // Thêm vào select so sánh nhóm ngành
+                        const option2 = document.createElement('option');
+                        option2.value = nhomNganh;
+                        option2.textContent = nhomNganh;
+                        nhomNganhCompareSelect.appendChild(option2);
+                    });
+                });
+        }
+    });
+</script>
+{% endblock %}
