@@ -93,6 +93,8 @@ def get_diem_chuan():
     nhom_nganh = request.args.get('nhom_nganh', '')
     to_hop_mon = request.args.get('to_hop_mon', '')
     diem_min = request.args.get('diem_min', '')
+    to_hop_mon = request.args.get('to_hop_mon', '')
+    diem_min = request.args.get('diem_min', '')
     diem_max = request.args.get('diem_max', '')
     nganh = request.args.get('nganh', '')
 
@@ -154,13 +156,13 @@ def get_diem_chuan():
 @app.route('/api/truong-dao-tao', methods=['GET'])
 def get_truong_dao_tao():
     truong_list = mongo.db.diem_chuan.distinct('Trường đào tạo')
-    return jsonify(json.loads(json_util.dumps(truong_list)))
+    return jsonify(truong_list)
 
 
 @app.route('/api/nhom-nganh', methods=['GET'])
 def get_nhom_nganh():
     nhom_nganh_list = mongo.db.diem_chuan.distinct('Nhóm ngành')
-    return jsonify(json.loads(json_util.dumps(nhom_nganh_list)))
+    return jsonify(nhom_nganh_list)
 
 
 @app.route('/api/nganh', methods=['GET'])
@@ -173,7 +175,7 @@ def get_nganh():
     else:
         nganh_list = mongo.db.diem_chuan.distinct('Ngành')
 
-    return jsonify(json.loads(json_util.dumps(nganh_list)))
+    return jsonify(nganh_list)
 
 
 @app.route('/api/to-hop-mon', methods=['GET'])
@@ -187,12 +189,17 @@ def get_to_hop_mon():
                 if part:
                     unique_to_hop.add(part)
 
-    return jsonify(json.loads(json_util.dumps(sorted(list(unique_to_hop)))))
+    return jsonify(sorted(list(unique_to_hop)))
 
 
 @app.route('/api/thong-ke/phan-bo-diem', methods=['GET'])
 def get_phan_bo_diem():
     pipeline = [
+        {
+            '$match': {
+                'Điểm chuẩn 2024': {'$exists': True, '$ne': ''}
+            }
+        },
         {
             '$group': {
                 '_id': {
@@ -216,26 +223,61 @@ def get_phan_bo_diem():
     ]
 
     result = list(mongo.db.diem_chuan.aggregate(pipeline))
-    return jsonify(json.loads(json_util.dumps(result)))
+    return jsonify(result)
 
 
 @app.route('/api/thong-ke/nhom-nganh', methods=['GET'])
 def get_thong_ke_nhom_nganh():
     pipeline = [
         {
-            '$group': {
-                '_id': '$Nhóm ngành',
-                'count': {'$sum': 1},
-                'avg_score': {'$avg': {'$toDouble': '$Điểm chuẩn 2024'}}
+            '$match': {
+                'Nhóm ngành': {'$exists': True, '$ne': ''},
+                'Điểm chuẩn 2024': {'$exists': True, '$ne': ''}
             }
         },
         {
-            '$sort': {'_id': 1}
+            '$group': {
+                '_id': '$Nhóm ngành',
+                'count': {'$sum': 1},
+                'avg_score': {'$avg': {'$toDouble': '$Điểm chuẩn 2024'}},
+                'max_score': {'$max': {'$toDouble': '$Điểm chuẩn 2024'}},
+                'min_score': {'$min': {'$toDouble': '$Điểm chuẩn 2024'}}
+            }
+        },
+        {
+            '$sort': {'avg_score': -1}
         }
     ]
 
     result = list(mongo.db.diem_chuan.aggregate(pipeline))
-    return jsonify(json.loaFds(json_util.dumps(result)))
+    return jsonify(result)
+
+
+@app.route('/api/thong-ke/truong', methods=['GET'])
+def get_thong_ke_truong():
+    pipeline = [
+        {
+            '$match': {
+                'Trường đào tạo': {'$exists': True, '$ne': ''},
+                'Điểm chuẩn 2024': {'$exists': True, '$ne': ''}
+            }
+        },
+        {
+            '$group': {
+                '_id': '$Trường đào tạo',
+                'count': {'$sum': 1},
+                'avg_score': {'$avg': {'$toDouble': '$Điểm chuẩn 2024'}},
+                'max_score': {'$max': {'$toDouble': '$Điểm chuẩn 2024'}},
+                'min_score': {'$min': {'$toDouble': '$Điểm chuẩn 2024'}}
+            }
+        },
+        {
+            '$sort': {'avg_score': -1}
+        }
+    ]
+
+    result = list(mongo.db.diem_chuan.aggregate(pipeline))
+    return jsonify(result)
 
 
 if __name__ == '__main__':
