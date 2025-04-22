@@ -109,7 +109,7 @@ def get_chatbot_response(question: str) -> str:
 
         answer = get_answer_from_context(question, matched_contexts)
 
-        return answer
+        return answer.replace("\n", "<br>")
     except Exception as e:
         print(f"Lỗi khi xử lý câu hỏi: {e}")
         return "Đã xảy ra lỗi khi xử lý câu hỏi của bạn. Vui lòng thử lại sau."
