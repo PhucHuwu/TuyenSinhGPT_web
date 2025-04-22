@@ -6,26 +6,208 @@
         <h5 class="mb-0">Thống kê Điểm Chuẩn Theo Trường</h5>
       </div>
       <div class="card-body">
-        <div class="row">
-          <div class="col-md-12 mb-4">
-            <canvas id="diemTrungBinhChart"></canvas>
+        <div class="row mb-3">
+          <div class="col-md-5">
+            <div class="input-group">
+              <input
+                type="text"
+                id="searchTruongInput"
+                class="form-control"
+                placeholder="Tìm kiếm trường..."
+              />
+              <button class="btn btn-primary" id="searchTruongBtn">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="filterDiemSelect" class="form-select">
+              <option value="">Lọc theo điểm</option>
+              <option value="35">Trên 35 điểm</option>
+              <option value="30">Trên 30 điểm</option>
+              <option value="25">Trên 25 điểm</option>
+              <option value="20">Trên 20 điểm</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select id="limitSelect" class="form-select">
+              <option value="10" selected>10 trường</option>
+              <option value="20">20 trường</option>
+              <option value="50">50 trường</option>
+              <option value="100">100 trường</option>
+            </select>
           </div>
         </div>
 
-        <div class="table-responsive mt-4">
+        <div class="table-responsive">
           <table class="table table-striped table-hover">
             <thead class="table-primary">
               <tr>
-                <th>Trường đào tạo</th>
-                <th class="text-center">Điểm trung bình</th>
-                <th class="text-center">Điểm cao nhất</th>
-                <th class="text-center">Điểm thấp nhất</th>
-                <th class="text-center">Số ngành</th>
+                <th data-sort="truong">
+                  Trường đào tạo <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="avg" class="text-center">
+                  Điểm trung bình <i class="bi bi-arrow-down sort-icon"></i>
+                </th>
+                <th data-sort="max" class="text-center">
+                  Điểm cao nhất <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="min" class="text-center">
+                  Điểm thấp nhất <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="count" class="text-center">
+                  Số ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
               </tr>
             </thead>
-            <tbody id="thongKeTable"></tbody>
+            <tbody id="truongStatsTable">
+              <tr>
+                <td colspan="5" class="text-center">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                  </div>
+                  <p>Đang tải dữ liệu...</p>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            Hiển thị <span id="currentRange">0-0</span> của
+            <span id="totalTruongs">0</span> trường
+          </div>
+          <nav>
+            <ul class="pagination" id="truongPagination"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Top 10 trường có điểm chuẩn trung bình cao nhất</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="topTruongChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Phân bố điểm chuẩn</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="diemPhanBoChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Thống kê Điểm Chuẩn Theo Nhóm Ngành</h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <div class="input-group">
+              <input
+                type="text"
+                id="searchNhomNganhInput"
+                class="form-control"
+                placeholder="Tìm kiếm nhóm ngành..."
+              />
+              <button class="btn btn-primary" id="searchNhomNganhBtn">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="limitNhomNganhSelect" class="form-select">
+              <option value="10" selected>10 nhóm ngành</option>
+              <option value="20">20 nhóm ngành</option>
+              <option value="50">Tất cả</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th data-sort="nhomNganh">
+                  Nhóm ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="avg" class="text-center">
+                  Điểm trung bình <i class="bi bi-arrow-down sort-icon"></i>
+                </th>
+                <th data-sort="max" class="text-center">
+                  Điểm cao nhất <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="min" class="text-center">
+                  Điểm thấp nhất <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+                <th data-sort="count" class="text-center">
+                  Số ngành <i class="bi bi-arrow-down-up sort-icon"></i>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="nhomNganhStatsTable">
+              <tr>
+                <td colspan="5" class="text-center">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                  </div>
+                  <p>Đang tải dữ liệu...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            Hiển thị <span id="currentNhomNganhRange">0-0</span> của
+            <span id="totalNhomNganhs">0</span> nhóm ngành
+          </div>
+          <nav>
+            <ul class="pagination" id="nhomNganhPagination"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">
+          Top 10 nhóm ngành có điểm chuẩn trung bình cao nhất
+        </h5>
+      </div>
+      <div class="card-body">
+        <canvas id="topNhomNganhChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">So sánh số lượng ngành theo nhóm ngành</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="nhomNganhCountChart" height="300"></canvas>
       </div>
     </div>
   </div>
@@ -33,82 +215,692 @@
 {% endblock %} {% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    fetch("/api/thong-ke/truong")
-      .then((response) => response.json())
-      .then((data) => {
-        renderThongKeTable(data);
-        renderChart(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    let topTruongChart = null;
+    let diemPhanBoChart = null;
+    let topNhomNganhChart = null;
+    let nhomNganhCountChart = null;
+
+    let allTruongStats = [];
+    let filteredTruongStats = [];
+    let allNhomNganhStats = [];
+    let filteredNhomNganhStats = [];
+    let currentTruongPage = 1;
+    let currentNhomNganhPage = 1;
+    let truongPerPage = 10;
+    let nhomNganhPerPage = 10;
+    let truongSortBy = "avg";
+    let truongSortOrder = -1;
+    let nhomNganhSortBy = "avg";
+    let nhomNganhSortOrder = -1;
+
+    loadTruongStats();
+
+    loadNhomNganhStats();
+
+    loadDiemPhanBo();
+
+    document
+      .getElementById("limitSelect")
+      .addEventListener("change", function () {
+        truongPerPage = parseInt(this.value);
+        currentTruongPage = 1;
+        renderTruongStatsTable();
       });
 
-    function renderThongKeTable(data) {
-      const tableBody = document.getElementById("thongKeTable");
+    document
+      .getElementById("limitNhomNganhSelect")
+      .addEventListener("change", function () {
+        nhomNganhPerPage = parseInt(this.value);
+        currentNhomNganhPage = 1;
+        renderNhomNganhStatsTable();
+      });
 
-      if (data.length === 0) {
+    document
+      .getElementById("searchTruongBtn")
+      .addEventListener("click", function () {
+        const searchTerm = document
+          .getElementById("searchTruongInput")
+          .value.toLowerCase();
+        filterTruongStats(searchTerm);
+      });
+
+    document
+      .getElementById("searchTruongInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          const searchTerm = this.value.toLowerCase();
+          filterTruongStats(searchTerm);
+        }
+      });
+
+    document
+      .getElementById("searchNhomNganhBtn")
+      .addEventListener("click", function () {
+        const searchTerm = document
+          .getElementById("searchNhomNganhInput")
+          .value.toLowerCase();
+        filterNhomNganhStats(searchTerm);
+      });
+
+    document
+      .getElementById("searchNhomNganhInput")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          const searchTerm = this.value.toLowerCase();
+          filterNhomNganhStats(searchTerm);
+        }
+      });
+
+    document
+      .getElementById("filterDiemSelect")
+      .addEventListener("change", function () {
+        const minDiem = parseFloat(this.value) || 0;
+        filterTruongStatsByDiem(minDiem);
+      });
+
+    document
+      .querySelectorAll("#truongStatsTable")
+      .closest(".table")
+      .querySelectorAll("th[data-sort]")
+      .forEach((th) => {
+        th.addEventListener("click", function () {
+          const sortBy = this.getAttribute("data-sort");
+
+          if (truongSortBy === sortBy) {
+            truongSortOrder = truongSortOrder === 1 ? -1 : 1;
+          } else {
+            truongSortBy = sortBy;
+            truongSortOrder = -1;
+          }
+
+          updateSortIcons(this, truongSortOrder);
+
+          sortTruongStats();
+        });
+      });
+
+    document
+      .querySelectorAll("#nhomNganhStatsTable")
+      .closest(".table")
+      .querySelectorAll("th[data-sort]")
+      .forEach((th) => {
+        th.addEventListener("click", function () {
+          const sortBy = this.getAttribute("data-sort");
+
+          if (nhomNganhSortBy === sortBy) {
+            nhomNganhSortOrder = nhomNganhSortOrder === 1 ? -1 : 1;
+          } else {
+            nhomNganhSortBy = sortBy;
+            nhomNganhSortOrder = -1;
+          }
+
+          updateSortIcons(this, nhomNganhSortOrder);
+
+          sortNhomNganhStats();
+        });
+      });
+
+    function loadTruongStats() {
+      fetch("/api/diem-chuan?limit=1000")
+        .then((response) => response.json())
+        .then((data) => {
+          const truongStats = {};
+
+          data.data.forEach((item) => {
+            const truong = item["Trường đào tạo"];
+            const diem = parseFloat(item["Điểm chuẩn 2024"]);
+
+            if (truong && !isNaN(diem)) {
+              if (!truongStats[truong]) {
+                truongStats[truong] = {
+                  diems: [diem],
+                  count: 1,
+                };
+              } else {
+                truongStats[truong].diems.push(diem);
+                truongStats[truong].count += 1;
+              }
+            }
+          });
+
+          allTruongStats = [];
+          for (const truong in truongStats) {
+            const diems = truongStats[truong].diems;
+            const count = truongStats[truong].count;
+            const avg = diems.reduce((a, b) => a + b, 0) / diems.length;
+            const max = Math.max(...diems);
+            const min = Math.min(...diems);
+
+            allTruongStats.push({
+              truong: truong,
+              avg: avg.toFixed(2),
+              max: max.toFixed(2),
+              min: min.toFixed(2),
+              count: count,
+            });
+          }
+
+          allTruongStats.sort((a, b) => b.avg - a.avg);
+          filteredTruongStats = [...allTruongStats];
+
+          renderTruongStatsTable();
+
+          renderTopTruongChart(allTruongStats.slice(0, 10));
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("truongStatsTable").innerHTML =
+            '<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+        });
+    }
+
+    function loadNhomNganhStats() {
+      fetch("/api/diem-chuan?limit=1000")
+        .then((response) => response.json())
+        .then((data) => {
+          const nhomNganhStats = {};
+
+          data.data.forEach((item) => {
+            const nhomNganh = item["Nhóm ngành"];
+            const diem = parseFloat(item["Điểm chuẩn 2024"]);
+            const nganh = item["Ngành"];
+
+            if (nhomNganh && !isNaN(diem)) {
+              if (!nhomNganhStats[nhomNganh]) {
+                nhomNganhStats[nhomNganh] = {
+                  diems: [diem],
+                  nganhs: new Set([nganh]),
+                };
+              } else {
+                nhomNganhStats[nhomNganh].diems.push(diem);
+                if (nganh) {
+                  nhomNganhStats[nhomNganh].nganhs.add(nganh);
+                }
+              }
+            }
+          });
+
+          allNhomNganhStats = [];
+          for (const nhomNganh in nhomNganhStats) {
+            const diems = nhomNganhStats[nhomNganh].diems;
+            const nganhCount = nhomNganhStats[nhomNganh].nganhs.size;
+            const avg = diems.reduce((a, b) => a + b, 0) / diems.length;
+            const max = Math.max(...diems);
+            const min = Math.min(...diems);
+
+            allNhomNganhStats.push({
+              nhomNganh: nhomNganh,
+              avg: avg.toFixed(2),
+              max: max.toFixed(2),
+              min: min.toFixed(2),
+              count: nganhCount,
+            });
+          }
+
+          allNhomNganhStats.sort((a, b) => b.avg - a.avg);
+          filteredNhomNganhStats = [...allNhomNganhStats];
+
+          renderNhomNganhStatsTable();
+
+          renderTopNhomNganhChart(allNhomNganhStats.slice(0, 10));
+
+          renderNhomNganhCountChart(allNhomNganhStats.slice(0, 10));
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("nhomNganhStatsTable").innerHTML =
+            '<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+        });
+    }
+
+    function loadDiemPhanBo() {
+      fetch("/api/diem-chuan?limit=1000")
+        .then((response) => response.json())
+        .then((data) => {
+          const diemRanges = {
+            "15-18": 0,
+            "18-20": 0,
+            "20-22": 0,
+            "22-24": 0,
+            "24-26": 0,
+            "26-28": 0,
+            "28-30": 0,
+          };
+
+          data.data.forEach((item) => {
+            const diem = parseFloat(item["Điểm chuẩn 2024"]);
+            if (!isNaN(diem)) {
+              if (diem < 18) diemRanges["15-18"]++;
+              else if (diem < 20) diemRanges["18-20"]++;
+              else if (diem < 22) diemRanges["20-22"]++;
+              else if (diem < 24) diemRanges["22-24"]++;
+              else if (diem < 26) diemRanges["24-26"]++;
+              else if (diem < 28) diemRanges["26-28"]++;
+              else diemRanges["28-30"]++;
+            }
+          });
+
+          renderDiemPhanBoChart(diemRanges);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+
+    function filterTruongStats(searchTerm) {
+      if (!searchTerm) {
+        filteredTruongStats = [...allTruongStats];
+      } else {
+        filteredTruongStats = allTruongStats.filter((stat) =>
+          stat.truong.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      currentTruongPage = 1;
+      renderTruongStatsTable();
+    }
+
+    function filterTruongStatsByDiem(minDiem) {
+      if (minDiem <= 0) {
+        filteredTruongStats = [...allTruongStats];
+      } else {
+        filteredTruongStats = allTruongStats.filter(
+          (stat) => parseFloat(stat.avg) >= minDiem
+        );
+      }
+
+      currentTruongPage = 1;
+      renderTruongStatsTable();
+    }
+
+    function filterNhomNganhStats(searchTerm) {
+      if (!searchTerm) {
+        filteredNhomNganhStats = [...allNhomNganhStats];
+      } else {
+        filteredNhomNganhStats = allNhomNganhStats.filter((stat) =>
+          stat.nhomNganh.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      currentNhomNganhPage = 1;
+      renderNhomNganhStatsTable();
+    }
+
+    function sortTruongStats() {
+      filteredTruongStats.sort((a, b) => {
+        let valA, valB;
+
+        if (truongSortBy === "truong") {
+          valA = a.truong;
+          valB = b.truong;
+          return truongSortOrder * valA.localeCompare(valB);
+        } else {
+          valA = parseFloat(a[truongSortBy]);
+          valB = parseFloat(b[truongSortBy]);
+          return truongSortOrder * (valA - valB);
+        }
+      });
+
+      renderTruongStatsTable();
+    }
+
+    function sortNhomNganhStats() {
+      filteredNhomNganhStats.sort((a, b) => {
+        let valA, valB;
+
+        if (nhomNganhSortBy === "nhomNganh") {
+          valA = a.nhomNganh;
+          valB = b.nhomNganh;
+          return nhomNganhSortOrder * valA.localeCompare(valB);
+        } else {
+          valA = parseFloat(a[nhomNganhSortBy]);
+          valB = parseFloat(b[nhomNganhSortBy]);
+          return nhomNganhSortOrder * (valA - valB);
+        }
+      });
+
+      renderNhomNganhStatsTable();
+    }
+
+    function updateSortIcons(clickedHeader, sortOrder) {
+      clickedHeader
+        .closest("tr")
+        .querySelectorAll(".sort-icon")
+        .forEach((icon) => {
+          icon.className = "bi bi-arrow-down-up sort-icon";
+        });
+
+      const icon = clickedHeader.querySelector(".sort-icon");
+      icon.className = `bi bi-arrow-${
+        sortOrder === 1 ? "up" : "down"
+      } sort-icon`;
+    }
+
+    function renderTruongStatsTable() {
+      const tableBody = document.getElementById("truongStatsTable");
+
+      if (filteredTruongStats.length === 0) {
         tableBody.innerHTML =
           '<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>';
+        document.getElementById("totalTruongs").textContent = "0";
+        document.getElementById("currentRange").textContent = "0-0";
+        document.getElementById("truongPagination").innerHTML = "";
         return;
       }
 
+      const totalPages = Math.ceil(filteredTruongStats.length / truongPerPage);
+      if (currentTruongPage > totalPages) {
+        currentTruongPage = totalPages;
+      }
+
+      const startIndex = (currentTruongPage - 1) * truongPerPage;
+      const endIndex = Math.min(
+        startIndex + truongPerPage,
+        filteredTruongStats.length
+      );
+      const currentPageData = filteredTruongStats.slice(startIndex, endIndex);
+
+      document.getElementById("totalTruongs").textContent =
+        filteredTruongStats.length;
+      document.getElementById("currentRange").textContent = `${
+        startIndex + 1
+      }-${endIndex}`;
+
       let html = "";
-      data.forEach((item) => {
+      currentPageData.forEach((stat) => {
+        let avgClass = "";
+        const avg = parseFloat(stat.avg);
+        if (avg >= 28) avgClass = "text-danger fw-bold";
+        else if (avg >= 25) avgClass = "text-warning fw-bold";
+        else if (avg >= 22) avgClass = "text-success fw-bold";
+
         html += `
                 <tr>
-                    <td>${item._id || ""}</td>
-                    <td class="text-center">${item.diem_trung_binh.toFixed(
-                      2
-                    )}</td>
-                    <td class="text-center">${item.diem_cao_nhat.toFixed(
-                      2
-                    )}</td>
-                    <td class="text-center">${item.diem_thap_nhat.toFixed(
-                      2
-                    )}</td>
-                    <td class="text-center">${item.so_nganh}</td>
+                    <td>${stat.truong}</td>
+                    <td class="text-center ${avgClass}">${stat.avg}</td>
+                    <td class="text-center">${stat.max}</td>
+                    <td class="text-center">${stat.min}</td>
+                    <td class="text-center">${stat.count}</td>
                 </tr>
                 `;
       });
 
       tableBody.innerHTML = html;
+
+      renderTruongPagination(totalPages);
     }
 
-    function renderChart(data) {
-      const top15 = data.slice(0, 15);
+    function renderNhomNganhStatsTable() {
+      const tableBody = document.getElementById("nhomNganhStatsTable");
 
-      const labels = top15.map((item) => item._id);
-      const diemTrungBinh = top15.map((item) => item.diem_trung_binh);
-      const diemCaoNhat = top15.map((item) => item.diem_cao_nhat);
-      const diemThapNhat = top15.map((item) => item.diem_thap_nhat);
+      if (filteredNhomNganhStats.length === 0) {
+        tableBody.innerHTML =
+          '<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>';
+        document.getElementById("totalNhomNganhs").textContent = "0";
+        document.getElementById("currentNhomNganhRange").textContent = "0-0";
+        document.getElementById("nhomNganhPagination").innerHTML = "";
+        return;
+      }
 
-      const ctx = document
-        .getElementById("diemTrungBinhChart")
-        .getContext("2d");
-      new Chart(ctx, {
+      const totalPages = Math.ceil(
+        filteredNhomNganhStats.length / nhomNganhPerPage
+      );
+      if (currentNhomNganhPage > totalPages) {
+        currentNhomNganhPage = totalPages;
+      }
+
+      const startIndex = (currentNhomNganhPage - 1) * nhomNganhPerPage;
+      const endIndex = Math.min(
+        startIndex + nhomNganhPerPage,
+        filteredNhomNganhStats.length
+      );
+      const currentPageData = filteredNhomNganhStats.slice(
+        startIndex,
+        endIndex
+      );
+
+      document.getElementById("totalNhomNganhs").textContent =
+        filteredNhomNganhStats.length;
+      document.getElementById("currentNhomNganhRange").textContent = `${
+        startIndex + 1
+      }-${endIndex}`;
+
+      let html = "";
+      currentPageData.forEach((stat) => {
+        let avgClass = "";
+        const avg = parseFloat(stat.avg);
+        if (avg >= 28) avgClass = "text-danger fw-bold";
+        else if (avg >= 25) avgClass = "text-warning fw-bold";
+        else if (avg >= 22) avgClass = "text-success fw-bold";
+
+        html += `
+                <tr>
+                    <td>${stat.nhomNganh}</td>
+                    <td class="text-center ${avgClass}">${stat.avg}</td>
+                    <td class="text-center">${stat.max}</td>
+                    <td class="text-center">${stat.min}</td>
+                    <td class="text-center">${stat.count}</td>
+                </tr>
+                `;
+      });
+
+      tableBody.innerHTML = html;
+
+      renderNhomNganhPagination(totalPages);
+    }
+
+    function renderTruongPagination(totalPages) {
+      const pagination = document.getElementById("truongPagination");
+
+      if (totalPages <= 1) {
+        pagination.innerHTML = "";
+        return;
+      }
+
+      let html = "";
+
+      html += `
+            <li class="page-item ${currentTruongPage === 1 ? "disabled" : ""}">
+                <a class="page-link" href="#" data-page="${
+                  currentTruongPage - 1
+                }">Trước</a>
+            </li>
+            `;
+
+      const maxPages = 5;
+      let startPage = Math.max(1, currentTruongPage - Math.floor(maxPages / 2));
+      let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+      if (endPage - startPage + 1 < maxPages) {
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+                <li class="page-item ${
+                  i === currentTruongPage ? "active" : ""
+                }">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+                `;
+      }
+
+      html += `
+            <li class="page-item ${
+              currentTruongPage === totalPages ? "disabled" : ""
+            }">
+                <a class="page-link" href="#" data-page="${
+                  currentTruongPage + 1
+                }">Sau</a>
+            </li>
+            `;
+
+      pagination.innerHTML = html;
+
+      document
+        .querySelectorAll("#truongPagination .page-link")
+        .forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const page = parseInt(this.getAttribute("data-page"));
+            if (page >= 1 && page <= totalPages) {
+              currentTruongPage = page;
+              renderTruongStatsTable();
+            }
+          });
+        });
+    }
+
+    function renderNhomNganhPagination(totalPages) {
+      const pagination = document.getElementById("nhomNganhPagination");
+
+      if (totalPages <= 1) {
+        pagination.innerHTML = "";
+        return;
+      }
+
+      let html = "";
+
+      html += `
+            <li class="page-item ${
+              currentNhomNganhPage === 1 ? "disabled" : ""
+            }">
+                <a class="page-link" href="#" data-page="${
+                  currentNhomNganhPage - 1
+                }">Trước</a>
+            </li>
+            `;
+
+      const maxPages = 5;
+      let startPage = Math.max(
+        1,
+        currentNhomNganhPage - Math.floor(maxPages / 2)
+      );
+      let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+      if (endPage - startPage + 1 < maxPages) {
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+                <li class="page-item ${
+                  i === currentNhomNganhPage ? "active" : ""
+                }">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+                `;
+      }
+
+      html += `
+            <li class="page-item ${
+              currentNhomNganhPage === totalPages ? "disabled" : ""
+            }">
+                <a class="page-link" href="#" data-page="${
+                  currentNhomNganhPage + 1
+                }">Sau</a>
+            </li>
+            `;
+
+      pagination.innerHTML = html;
+
+      document
+        .querySelectorAll("#nhomNganhPagination .page-link")
+        .forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const page = parseInt(this.getAttribute("data-page"));
+            if (page >= 1 && page <= totalPages) {
+              currentNhomNganhPage = page;
+              renderNhomNganhStatsTable();
+            }
+          });
+        });
+    }
+
+    function renderTopTruongChart(statsArray) {
+      const ctx = document.getElementById("topTruongChart").getContext("2d");
+
+      if (topTruongChart) {
+        topTruongChart.destroy();
+      }
+
+      const labels = statsArray.map((stat) => stat.truong);
+      const data = statsArray.map((stat) => parseFloat(stat.avg));
+
+      topTruongChart = new Chart(ctx, {
         type: "bar",
         data: {
           labels: labels,
           datasets: [
             {
               label: "Điểm trung bình",
-              data: diemTrungBinh,
+              data: data,
               backgroundColor: "rgba(54, 162, 235, 0.5)",
               borderColor: "rgba(54, 162, 235, 1)",
               borderWidth: 1,
             },
-            {
-              label: "Điểm cao nhất",
-              data: diemCaoNhat,
-              backgroundColor: "rgba(75, 192, 192, 0.5)",
-              borderColor: "rgba(75, 192, 192, 1)",
-              borderWidth: 1,
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
             },
+            title: {
+              display: true,
+              text: "Top 10 trường có điểm chuẩn trung bình cao nhất",
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: false,
+              min: 20,
+              max: 80,
+            },
+          },
+        },
+      });
+    }
+
+    function renderDiemPhanBoChart(diemRanges) {
+      const ctx = document.getElementById("diemPhanBoChart").getContext("2d");
+
+      if (diemPhanBoChart) {
+        diemPhanBoChart.destroy();
+      }
+
+      const labels = Object.keys(diemRanges);
+      const data = Object.values(diemRanges);
+
+      diemPhanBoChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
             {
-              label: "Điểm thấp nhất",
-              data: diemThapNhat,
-              backgroundColor: "rgba(255, 99, 132, 0.5)",
-              borderColor: "rgba(255, 99, 132, 1)",
+              label: "Số lượng ngành",
+              data: data,
+              backgroundColor: [
+                "rgba(54, 162, 235, 0.5)",
+                "rgba(75, 192, 192, 0.5)",
+                "rgba(255, 206, 86, 0.5)",
+                "rgba(75, 192, 192, 0.5)",
+                "rgba(153, 102, 255, 0.5)",
+                "rgba(255, 159, 64, 0.5)",
+                "rgba(255, 99, 132, 0.5)",
+              ],
+              borderColor: [
+                "rgba(54, 162, 235, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+                "rgba(255, 159, 64, 1)",
+                "rgba(255, 99, 132, 1)",
+              ],
               borderWidth: 1,
             },
           ],
@@ -116,28 +908,136 @@
         options: {
           responsive: true,
           plugins: {
+            legend: {
+              display: false,
+            },
             title: {
               display: true,
-              text: "15 Trường có điểm chuẩn trung bình cao nhất",
-              font: {
-                size: 16,
-              },
-            },
-            legend: {
-              position: "top",
+              text: "Phân bố điểm chuẩn",
             },
           },
           scales: {
             y: {
-              beginAtZero: false,
-              min: 15,
-              max: 30,
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "Số lượng ngành",
+              },
             },
             x: {
-              ticks: {
-                maxRotation: 45,
-                minRotation: 45,
+              title: {
+                display: true,
+                text: "Khoảng điểm",
               },
+            },
+          },
+        },
+      });
+    }
+
+    function renderTopNhomNganhChart(statsArray) {
+      const ctx = document.getElementById("topNhomNganhChart").getContext("2d");
+
+      if (topNhomNganhChart) {
+        topNhomNganhChart.destroy();
+      }
+
+      const labels = statsArray.map((stat) => stat.nhomNganh);
+      const data = statsArray.map((stat) => parseFloat(stat.avg));
+
+      topNhomNganhChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Điểm trung bình",
+              data: data,
+              backgroundColor: "rgba(75, 192, 192, 0.5)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            title: {
+              display: true,
+              text: "Top 10 nhóm ngành có điểm chuẩn trung bình cao nhất",
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: false,
+              min: 20,
+              max: 80,
+            },
+          },
+        },
+      });
+    }
+
+    function renderNhomNganhCountChart(statsArray) {
+      const ctx = document
+        .getElementById("nhomNganhCountChart")
+        .getContext("2d");
+
+      if (nhomNganhCountChart) {
+        nhomNganhCountChart.destroy();
+      }
+
+      const labels = statsArray.map((stat) => stat.nhomNganh);
+      const data = statsArray.map((stat) => stat.count);
+
+      nhomNganhCountChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: data,
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.5)",
+                "rgba(54, 162, 235, 0.5)",
+                "rgba(255, 206, 86, 0.5)",
+                "rgba(75, 192, 192, 0.5)",
+                "rgba(153, 102, 255, 0.5)",
+                "rgba(255, 159, 64, 0.5)",
+                "rgba(255, 99, 132, 0.5)",
+                "rgba(54, 162, 235, 0.5)",
+                "rgba(255, 206, 86, 0.5)",
+                "rgba(75, 192, 192, 0.5)",
+              ],
+              borderColor: [
+                "rgba(255, 99, 132, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+                "rgba(255, 159, 64, 1)",
+                "rgba(255, 99, 132, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+              ],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "right",
+            },
+            title: {
+              display: true,
+              text: "Số lượng ngành theo nhóm ngành",
             },
           },
         },
