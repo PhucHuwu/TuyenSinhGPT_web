@@ -54,13 +54,16 @@ Dự án được xây dựng dựa trên kiến trúc MVC (Model-View-Controlle
 ├── import_data.py                      # Script tự động để nhập và làm sạch dữ liệu từ CSV vào MongoDB
 ├── requirements.txt
 ├── README.md
+│
 ├── data/
 │   ├── data_diem_chuan_cleaned.csv     # Dữ liệu điểm chuẩn đã qua xử lý và làm sạch
 │   ├── dataset.json                    # Tập dữ liệu câu hỏi-đáp cho chatbot
 │   └── vector_db.faiss                 # Vector database cho tìm kiếm ngữ nghĩa nhanh
+│
 ├── static/
 │   ├── css/
 │   │   └── style.css                   # File CSS chính
+│   │
 │   └── js/
 │       └── main.js                     # File JS chính cho các tính năng client-side
 │
