@@ -15,14 +15,32 @@
               <div class="card-body">
                 <div class="mb-3">
                   <label class="form-label">Chọn các trường để so sánh</label>
-                  <select
-                    id="truongCompareSelect"
-                    class="form-select"
-                    multiple
-                    size="5"
-                  ></select>
-                  <div class="form-text">
-                    Giữ Ctrl để chọn nhiều trường (tối đa 5)
+                  <div class="input-group mb-2">
+                    <span class="input-group-text"
+                      ><i class="bi bi-search"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="truongSearchInput"
+                      class="form-control"
+                      placeholder="Tìm kiếm trường..."
+                    />
+                  </div>
+                  <div
+                    class="truong-list-container border rounded p-2 mb-2"
+                    style="max-height: 200px; overflow-y: auto"
+                  >
+                    <ul class="truong-list list-group" id="truongList"></ul>
+                  </div>
+                  <div class="selected-truong-container mt-2">
+                    <label class="form-label"
+                      >Trường đã chọn (<span id="selectedTruongCount">0</span
+                      >/5):</label
+                    >
+                    <div
+                      id="selectedTruongList"
+                      class="selected-truong-list"
+                    ></div>
                   </div>
                 </div>
                 <div class="mb-3">
@@ -52,17 +70,37 @@
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Chọn các ngành để so sánh</label>
-                  <select
-                    id="nganhCompareSelect"
-                    class="form-select"
-                    multiple
-                    size="5"
-                    disabled
+                  <div class="input-group mb-2">
+                    <span class="input-group-text"
+                      ><i class="bi bi-search"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="nganhSearchInput"
+                      class="form-control"
+                      placeholder="Tìm kiếm ngành..."
+                      disabled
+                    />
+                  </div>
+                  <div
+                    class="nganh-list-container border rounded p-2 mb-2"
+                    style="max-height: 200px; overflow-y: auto"
                   >
-                    <option value="">Vui lòng chọn nhóm ngành trước</option>
-                  </select>
-                  <div class="form-text">
-                    Giữ Ctrl để chọn nhiều ngành (tối đa 5)
+                    <ul class="nganh-list list-group" id="nganhList">
+                      <li class="list-group-item text-center text-muted">
+                        Vui lòng chọn nhóm ngành trước
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="selected-nganh-container mt-2">
+                    <label class="form-label"
+                      >Ngành đã chọn (<span id="selectedNganhCount">0</span
+                      >/5):</label
+                    >
+                    <div
+                      id="selectedNganhList"
+                      class="selected-nganh-list"
+                    ></div>
                   </div>
                 </div>
                 <button
@@ -128,24 +166,249 @@
 {% endblock %} {% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    let compareChart = null;
+    const style = document.createElement("style");
+    style.textContent = `
+            .list-group-item.selected {
+                background-color: #e7f3ff;
+                border-color: #007bff;
+            }
+            .selected-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+                background-color: #e7f3ff;
+                border: 1px solid #b8daff;
+                border-radius: 0.25rem;
+            }
+            .remove-btn {
+                cursor: pointer;
+                color: #dc3545;
+            }
+            .remove-btn:hover {
+                color: #bd2130;
+            }
+        `;
+    document.head.appendChild(style);
 
     let compareChart = null;
+
+    let allTruongs = [];
 
     loadTruongDaoTao();
     loadNhomNganh();
+
+    let selectedTruongs = [];
+
+    document
+      .getElementById("truongSearchInput")
+      .addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const truongList = document.getElementById("truongList");
+
+        truongList.innerHTML = "";
+
+        const filteredTruongs = allTruongs.filter((truong) =>
+          truong.toLowerCase().includes(searchTerm)
+        );
+
+        if (filteredTruongs.length === 0) {
+          truongList.innerHTML =
+            '<li class="list-group-item text-center text-muted">Không tìm thấy trường phù hợp</li>';
+          return;
+        }
+
+        filteredTruongs.forEach((truong) => {
+          const item = document.createElement("li");
+          item.className = "list-group-item";
+          if (selectedTruongs.includes(truong)) {
+            item.classList.add("selected");
+          }
+          item.textContent = truong;
+          item.dataset.value = truong;
+
+          item.addEventListener("click", function () {
+            const value = this.dataset.value;
+            const index = selectedTruongs.indexOf(value);
+
+            if (index === -1) {
+              if (selectedTruongs.length < 5) {
+                selectedTruongs.push(value);
+                this.classList.add("selected");
+                updateSelectedTruongList();
+              } else {
+                alert("Bạn chỉ có thể chọn tối đa 5 trường để so sánh");
+              }
+            } else {
+              selectedTruongs.splice(index, 1);
+              this.classList.remove("selected");
+              updateSelectedTruongList();
+            }
+          });
+
+          truongList.appendChild(item);
+        });
+      });
+
+    function updateSelectedTruongList() {
+      const selectedList = document.getElementById("selectedTruongList");
+      const countElement = document.getElementById("selectedTruongCount");
+
+      countElement.textContent = selectedTruongs.length;
+
+      selectedList.innerHTML = "";
+
+      selectedTruongs.forEach((truong) => {
+        const item = document.createElement("div");
+        item.className = "selected-item";
+        item.innerHTML = `
+                    ${truong}
+                    <span class="remove-btn" data-value="${truong}"><i class="bi bi-x-circle"></i></span>
+                `;
+
+        item
+          .querySelector(".remove-btn")
+          .addEventListener("click", function (e) {
+            e.stopPropagation();
+            const value = this.dataset.value;
+            const index = selectedTruongs.indexOf(value);
+
+            if (index !== -1) {
+              selectedTruongs.splice(index, 1);
+              updateSelectedTruongList();
+
+              const truongItems = document.querySelectorAll(
+                "#truongList .list-group-item"
+              );
+              truongItems.forEach((item) => {
+                if (item.dataset.value === value) {
+                  item.classList.remove("selected");
+                }
+              });
+            }
+          });
+
+        selectedList.appendChild(item);
+      });
+    }
+
+    let allNganhs = [];
+    let selectedNganhs = [];
+
+    document
+      .getElementById("nganhSearchInput")
+      .addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const nganhList = document.getElementById("nganhList");
+
+        nganhList.innerHTML = "";
+
+        const filteredNganhs = allNganhs.filter((nganh) =>
+          nganh.toLowerCase().includes(searchTerm)
+        );
+
+        if (filteredNganhs.length === 0) {
+          nganhList.innerHTML =
+            '<li class="list-group-item text-center text-muted">Không tìm thấy ngành phù hợp</li>';
+          return;
+        }
+
+        filteredNganhs.forEach((nganh) => {
+          const item = document.createElement("li");
+          item.className = "list-group-item";
+          if (selectedNganhs.includes(nganh)) {
+            item.classList.add("selected");
+          }
+          item.textContent = nganh;
+          item.dataset.value = nganh;
+
+          item.addEventListener("click", function () {
+            const value = this.dataset.value;
+            const index = selectedNganhs.indexOf(value);
+
+            if (index === -1) {
+              if (selectedNganhs.length < 5) {
+                selectedNganhs.push(value);
+                this.classList.add("selected");
+                updateSelectedNganhList();
+              } else {
+                alert("Bạn chỉ có thể chọn tối đa 5 ngành để so sánh");
+              }
+            } else {
+              selectedNganhs.splice(index, 1);
+              this.classList.remove("selected");
+              updateSelectedNganhList();
+            }
+          });
+
+          nganhList.appendChild(item);
+        });
+      });
+
+    function updateSelectedNganhList() {
+      const selectedList = document.getElementById("selectedNganhList");
+      const countElement = document.getElementById("selectedNganhCount");
+
+      countElement.textContent = selectedNganhs.length;
+
+      selectedList.innerHTML = "";
+
+      selectedNganhs.forEach((nganh) => {
+        const item = document.createElement("div");
+        item.className = "selected-item";
+        item.innerHTML = `
+                    ${nganh}
+                    <span class="remove-btn" data-value="${nganh}"><i class="bi bi-x-circle"></i></span>
+                `;
+
+        item
+          .querySelector(".remove-btn")
+          .addEventListener("click", function (e) {
+            e.stopPropagation();
+            const value = this.dataset.value;
+            const index = selectedNganhs.indexOf(value);
+
+            if (index !== -1) {
+              selectedNganhs.splice(index, 1);
+              updateSelectedNganhList();
+
+              const nganhItems = document.querySelectorAll(
+                "#nganhList .list-group-item"
+              );
+              nganhItems.forEach((item) => {
+                if (item.dataset.value === value) {
+                  item.classList.remove("selected");
+                }
+              });
+            }
+          });
+
+        selectedList.appendChild(item);
+      });
+    }
 
     document
       .getElementById("nhomNganhSelect")
       .addEventListener("change", function () {
         const nhomNganh = this.value;
-        const nganhSelect = document.getElementById("nganhCompareSelect");
+        const nganhList = document.getElementById("nganhList");
+        const nganhSearchInput = document.getElementById("nganhSearchInput");
 
-        nganhSelect.innerHTML = "";
-        nganhSelect.disabled = true;
+        nganhList.innerHTML =
+          '<li class="list-group-item text-center text-muted">Đang tải...</li>';
+        nganhSearchInput.disabled = true;
+        nganhSearchInput.value = "";
         document.getElementById("compareNganhBtn").disabled = true;
 
-        if (!nhomNganh) return;
+        selectedNganhs = [];
+        updateSelectedNganhList();
+
+        if (!nhomNganh) {
+          nganhList.innerHTML =
+            '<li class="list-group-item text-center text-muted">Vui lòng chọn nhóm ngành trước</li>';
+          return;
+        }
 
         fetch(
           `/api/diem-chuan?nhom_nganh=${encodeURIComponent(
@@ -154,33 +417,58 @@
         )
           .then((response) => response.json())
           .then((data) => {
-            const nganhs = [...new Set(data.data.map((item) => item["Ngành"]))]
+            allNganhs = [...new Set(data.data.map((item) => item["Ngành"]))]
               .filter(Boolean)
               .sort();
 
-            if (nganhs.length > 0) {
-              nganhSelect.disabled = false;
+            nganhList.innerHTML = "";
+
+            if (allNganhs.length > 0) {
+              nganhSearchInput.disabled = false;
               document.getElementById("compareNganhBtn").disabled = false;
 
-              nganhs.forEach((nganh) => {
-                const option = document.createElement("option");
-                option.value = nganh;
-                option.textContent = nganh;
-                nganhSelect.appendChild(option);
+              allNganhs.forEach((nganh) => {
+                const item = document.createElement("li");
+                item.className = "list-group-item";
+                item.textContent = nganh;
+                item.dataset.value = nganh;
+
+                item.addEventListener("click", function () {
+                  const value = this.dataset.value;
+                  const index = selectedNganhs.indexOf(value);
+
+                  if (index === -1) {
+                    if (selectedNganhs.length < 5) {
+                      selectedNganhs.push(value);
+                      this.classList.add("selected");
+                      updateSelectedNganhList();
+                    } else {
+                      alert("Bạn chỉ có thể chọn tối đa 5 ngành để so sánh");
+                    }
+                  } else {
+                    selectedNganhs.splice(index, 1);
+                    this.classList.remove("selected");
+                    updateSelectedNganhList();
+                  }
+                });
+
+                nganhList.appendChild(item);
               });
             } else {
-              nganhSelect.innerHTML =
-                '<option value="">Không có ngành nào</option>';
+              nganhList.innerHTML =
+                '<li class="list-group-item text-center text-muted">Không có ngành nào thuộc nhóm này</li>';
             }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            nganhList.innerHTML =
+              '<li class="list-group-item text-center text-danger">Lỗi khi tải dữ liệu</li>';
           });
       });
 
     document
       .getElementById("compareTruongBtn")
       .addEventListener("click", function () {
-        const selectedTruongs = Array.from(
-          document.getElementById("truongCompareSelect").selectedOptions
-        ).map((option) => option.value);
         const nhomNganh = document.getElementById(
           "nhomNganhCompareSelect"
         ).value;
@@ -190,28 +478,14 @@
           return;
         }
 
-        if (selectedTruongs.length > 5) {
-          alert("Vui lòng chọn tối đa 5 trường để so sánh");
-          return;
-        }
-
         compareTruongs(selectedTruongs, nhomNganh);
       });
 
     document
       .getElementById("compareNganhBtn")
       .addEventListener("click", function () {
-        const selectedNganhs = Array.from(
-          document.getElementById("nganhCompareSelect").selectedOptions
-        ).map((option) => option.value);
-
         if (selectedNganhs.length === 0) {
           alert("Vui lòng chọn ít nhất một ngành để so sánh");
-          return;
-        }
-
-        if (selectedNganhs.length > 5) {
-          alert("Vui lòng chọn tối đa 5 ngành để so sánh");
           return;
         }
 
@@ -550,24 +824,55 @@
       fetch("/api/truong-dao-tao")
         .then((response) => response.json())
         .then((data) => {
-          const truongSelect = document.getElementById("truongCompareSelect");
-          const truongFilterSelect = document.getElementById(
-            "truongCompareSelect"
-          );
+          if (Array.isArray(data)) {
+            allTruongs = data.sort();
+          } else if (data.data && Array.isArray(data.data)) {
+            allTruongs = data.data.sort();
+          } else {
+            allTruongs = [];
+            console.error("Cấu trúc dữ liệu không đúng:", data);
+          }
 
-          data.sort().forEach((truong) => {
-            const option1 = document.createElement("option");
-            option1.value = truong;
-            option1.textContent = truong;
-            truongSelect.appendChild(option1);
+          const truongList = document.getElementById("truongList");
 
-            const option2 = document.createElement("option");
-            option2.value = truong;
-            option2.textContent = truong;
-            if (truongFilterSelect) {
-              truongFilterSelect.appendChild(option2);
-            }
+          if (allTruongs.length === 0) {
+            truongList.innerHTML =
+              '<li class="list-group-item text-center text-muted">Không có trường nào</li>';
+            return;
+          }
+
+          allTruongs.forEach((truong) => {
+            const item = document.createElement("li");
+            item.className = "list-group-item";
+            item.textContent = truong;
+            item.dataset.value = truong;
+
+            item.addEventListener("click", function () {
+              const value = this.dataset.value;
+              const index = selectedTruongs.indexOf(value);
+
+              if (index === -1) {
+                if (selectedTruongs.length < 5) {
+                  selectedTruongs.push(value);
+                  this.classList.add("selected");
+                  updateSelectedTruongList();
+                } else {
+                  alert("Bạn chỉ có thể chọn tối đa 5 trường để so sánh");
+                }
+              } else {
+                selectedTruongs.splice(index, 1);
+                this.classList.remove("selected");
+                updateSelectedTruongList();
+              }
+            });
+
+            truongList.appendChild(item);
           });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.getElementById("truongList").innerHTML =
+            '<li class="list-group-item text-center text-danger">Lỗi khi tải dữ liệu</li>';
         });
     }
 
@@ -575,22 +880,51 @@
       fetch("/api/nhom-nganh")
         .then((response) => response.json())
         .then((data) => {
-          const nhomNganhSelect = document.getElementById("nhomNganhSelect");
-          const nhomNganhCompareSelect = document.getElementById(
+          const nhomNganhSelect = document.getElementById(
             "nhomNganhCompareSelect"
           );
+          const nhomNganhSelectNganh =
+            document.getElementById("nhomNganhSelect");
 
-          data.sort().forEach((nhomNganh) => {
-            const option1 = document.createElement("option");
-            option1.value = nhomNganh;
-            option1.textContent = nhomNganh;
-            nhomNganhSelect.appendChild(option1);
+          while (nhomNganhSelect.options.length > 1) {
+            nhomNganhSelect.remove(1);
+          }
 
-            const option2 = document.createElement("option");
-            option2.value = nhomNganh;
-            option2.textContent = nhomNganh;
-            nhomNganhCompareSelect.appendChild(option2);
+          while (nhomNganhSelectNganh.options.length > 1) {
+            nhomNganhSelectNganh.remove(1);
+          }
+
+          let nhomNganhs = [];
+          if (Array.isArray(data)) {
+            nhomNganhs = data;
+          } else if (data.data && Array.isArray(data.data)) {
+            nhomNganhs = data.data;
+          }
+
+          nhomNganhs.sort();
+
+          nhomNganhs.forEach((nhomNganh) => {
+            const nhomNganhValue =
+              typeof nhomNganh === "object"
+                ? nhomNganh["Nhóm ngành"]
+                : nhomNganh;
+
+            if (nhomNganhValue) {
+              const option = document.createElement("option");
+              option.value = nhomNganhValue;
+              option.textContent = nhomNganhValue;
+              nhomNganhSelect.appendChild(option);
+
+              const optionNganh = document.createElement("option");
+              optionNganh.value = nhomNganhValue;
+              optionNganh.textContent = nhomNganhValue;
+              nhomNganhSelectNganh.appendChild(optionNganh);
+            }
           });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Lỗi khi tải danh sách nhóm ngành");
         });
     }
   });
